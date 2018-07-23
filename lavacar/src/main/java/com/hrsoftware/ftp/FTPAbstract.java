@@ -13,10 +13,10 @@ import com.hrsoftware.utilitario.Ferramentas;
 
 public abstract class FTPAbstract implements FTPConnection {
 
-	public static final String host = "lavacardb-cloud.umbler.net";
+	public static final String host = "urlFTP";
 	public static final int port = 21;
-	public static final String user = "lavacardb-cloud";
-	public static final String password = ">R9*)CavrYg_a$[";
+	public static final String user = "usrFTP";
+	public static final String password = "passwordFTP";
 
 	public static String getPathDownloads() {
 		return System.getProperty("java.io.tmpdir") + "/relatorio/";
