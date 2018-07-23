@@ -16,7 +16,7 @@ public class Main extends Application {
 	@Override
 	public void start(Stage stageRoot) throws IOException {
 
-		/* lançaJPA(); */
+		/*lançaJPA();*/
 
 		RelatorioBuilder.deletaRelatoriosTemp();
 

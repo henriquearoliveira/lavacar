@@ -14,6 +14,7 @@ import com.hrsoftware.components.alerts.AlertDialog;
 import com.hrsoftware.comum.AppManager;
 import com.hrsoftware.services.ServicosRest;
 import com.hrsoftware.services.UrlsConnect;
+import com.hrsoftware.services.http.MethodHTTP;
 import com.hrsoftware.utilitario.Ferramentas;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
@@ -133,11 +134,12 @@ public class ClienteController extends ViewAbstract<Cliente> implements Initiali
 			return;
 		}
 
-		ServicosRest<Cliente> clientesServices = new ServicosRest<>(UrlsConnect.BAIRRO + cep, Cliente.class);
+		ServicosRest<Cliente> services = new ServicosRest<>(UrlsConnect.BAIRRO + cep, Cliente.class,
+				MethodHTTP.GET);
 
-		Cliente cliente = clientesServices.readValue();
-
-		preencheCamposCEP(cliente);
+		services.doRequest(cliente -> {
+			preencheCamposCEP(cliente);
+		});
 
 	}
 

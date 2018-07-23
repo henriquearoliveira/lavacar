@@ -10,7 +10,7 @@ public class JpaUtil {
 	
 	private EntityManagerFactory emf = null;
 	
-    private static final String DATA_BASE_NAME = "lavacar";
+    private static final String DATA_BASE_NAME = "testebd";
 
 	private JpaUtil() {
 	}
