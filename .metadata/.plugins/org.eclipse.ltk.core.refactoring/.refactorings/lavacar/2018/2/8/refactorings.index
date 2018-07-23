@@ -1,0 +1,22 @@
+1519064782171	Rename method 'showJanelaPopup'
+1519150851424	Delete element
+1519217896092	Rename type 'LoadingBar'
+1519232506310	Rename type 'AlertDialogError'
+1519232536121	Move compilation units
+1519232745775	Delete element
+1519232761159	Copy compilation unit
+1519232773188	Copy compilation unit
+1519233074922	Rename type 'AlertDialogSuccess'
+1519233099721	Copy compilation unit
+1519234020433	Rename type 'Noticacao'
+1519301210467	Extract method 'ordenaListaCadastrados'
+1519392498961	Delete element
+1519392559362	Delete element
+1519392585125	Delete element
+1519392846214	Delete element
+1519405676473	Copy compilation unit
+1519405686095	Copy file
+1519405722303	Copy compilation unit
+1519406973950	Rename method 'gravaCliente'
+1519406981739	Rename method 'atualizaCliente'
+1519407293164	Rename method 'atualizaCliente'

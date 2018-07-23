@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.effect.Glow?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="481.0" prefWidth="620.0" stylesheets="@css/Buttons.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hrsoftware.business.view.VeiculoController">
+   <children>
+      <Group layoutX="549.0" layoutY="2.0">
+         <children>
+            <Button layoutX="39.0" mnemonicParsing="false" onAction="#onClose" style="-fx-background-color: transparent;">
+               <graphic>
+                  <MaterialDesignIconView glyphName="WINDOW_CLOSE" size="14">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor></MaterialDesignIconView>
+               </graphic>
+            </Button>
+            <Button alignment="BOTTOM_CENTER" layoutX="12.0" layoutY="2.0" mnemonicParsing="false" onAction="#onMinimize" style="-fx-background-color: transparent;">
+               <graphic>
+                  <MaterialDesignIconView glyphName="WINDOW_MINIMIZE" size="14">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor></MaterialDesignIconView>
+               </graphic>
+            </Button>
+         </children>
+      </Group>
+      <Label layoutX="251.0" layoutY="23.0" text="Veiculos">
+         <font>
+            <Font size="28.0" />
+         </font>
+         <effect>
+            <Glow />
+         </effect>
+      </Label>
+      <JFXTextField fx:id="txtNome" labelFloat="true" layoutX="14.0" layoutY="80.0" prefHeight="26.0" prefWidth="285.0" promptText="Nome:" AnchorPane.leftAnchor="10.0" />
+      <JFXTextField fx:id="txtPlaca" labelFloat="true" layoutX="314.0" layoutY="80.0" prefHeight="26.0" prefWidth="138.0" promptText="Placa:" />
+      <JFXTextField fx:id="txtCor" labelFloat="true" layoutX="470.0" layoutY="80.0" prefHeight="26.0" prefWidth="138.0" promptText="Cor:" AnchorPane.rightAnchor="10.0" />
+      <TableView fx:id="tableCadastrados" layoutX="12.0" layoutY="178.0" onMouseClicked="#acaoTabelaCliente" prefHeight="235.0" prefWidth="595.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
+      <Button fx:id="btnGravar" layoutX="272.0" layoutY="432.0" mnemonicParsing="false" onAction="#acaoBotaoGravar" prefHeight="25.0" prefWidth="92.0" text="Gravar">
+         <graphic>
+            <MaterialDesignIconView fill="#07f76a" glyphName="CHECK" size="20" />
+         </graphic>
+      </Button>
+      <Button fx:id="btnNovo" layoutX="378.0" layoutY="432.0" mnemonicParsing="false" onAction="#acaoBotaoNovo" prefHeight="30.0" prefWidth="92.0" text="Novo">
+         <graphic>
+            <MaterialDesignIconView fill="#0087f5" glyphName="BORDER_COLOR" size="16" translateY="2.0" />
+         </graphic>
+      </Button>
+      <Button fx:id="btnExcluir" disable="true" layoutX="166.0" layoutY="432.0" mnemonicParsing="false" onAction="#acaoBotaoExcluir" prefHeight="30.0" prefWidth="92.0" text="Excluir">
+         <graphic>
+            <MaterialDesignIconView fill="RED" glyphName="DELETE" size="16" />
+         </graphic>
+      </Button>
+      <JFXComboBox fx:id="cbxCliente" labelFloat="true" layoutX="10.0" layoutY="127.0" prefHeight="26.0" prefWidth="601.0" promptText="Cliente:" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
+   </children>
+</AnchorPane>

@@ -1,0 +1,24 @@
+1516638032919	Copy file
+1516797498752	Rename package 'com.htsoftware.business'
+1516810752602	Rename type 'Carro'
+1516812248553	Delete element
+1516814482504	Rename type 'Servico'
+1516815439016	Move compilation unit
+1516818329519	Rename package 'com.hrsoftware.principal'
+1516818487791	Delete element
+1516818527289	Move compilation unit
+1516818545801	Move compilation unit
+1516818564687	Move file
+1516818785859	Move compilation unit
+1516818798747	Move file
+1516818863461	Rename resource 'back.jpg'
+1516818867766	Move file
+1516818935890	Move file
+1516818968486	Move file
+1516818992125	Move files
+1516819032632	Move files
+1516819052770	Move file
+1516874029278	Rename resource 'spash.jpg'
+1516874355489	Move files
+1516875373423	Rename resource 'Notification.css'
+1516876351143	Extract method 'configuraColunasTabela'

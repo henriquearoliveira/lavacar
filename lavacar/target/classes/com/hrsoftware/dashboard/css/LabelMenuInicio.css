@@ -1,0 +1,13 @@
+/* #menuCadCarros, #menuCadServicos {
+	-fx-background-color: rgb(238,238,236);
+}*/
+
+#menuCadCarros:hover, #menuCadServicos:hover, #menuCadCliente:hover, #menuCaixaFinaliza:hover, #menuCadLancamento:hover,
+#relatorioFluxoCaixa:hover, #relatorioFluxoCaixaPeriodo:hover{
+	-fx-background-color: rgb(238,238,236);
+	-fx-cursor: hand;
+}
+
+#painelInicio {
+	-fx-background-color: #f7f7f7;
+}

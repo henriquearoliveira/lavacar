@@ -1,0 +1,482 @@
+package com.hrsoftware.business.view;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ResourceBundle;
+
+import com.hrsoftware.GerenciadorStage;
+import com.hrsoftware.business.BusinessClient;
+import com.hrsoftware.business.Cliente;
+import com.hrsoftware.business.FluxoDeCaixa;
+import com.hrsoftware.business.Servico;
+import com.hrsoftware.business.ServicoVeiculo;
+import com.hrsoftware.business.StatusDoServico;
+import com.hrsoftware.business.Veiculo;
+import com.hrsoftware.business.dao.ClienteDAO;
+import com.hrsoftware.business.dao.FluxoDeCaixaDAO;
+import com.hrsoftware.business.dao.ServicoDAO;
+import com.hrsoftware.business.dao.ServicoVeiculoDAO;
+import com.hrsoftware.business.dao.VeiculoDAO;
+import com.hrsoftware.components.LoadingDialog;
+import com.hrsoftware.components.TableFactory;
+import com.hrsoftware.components.alerts.AlertDialog;
+import com.hrsoftware.comum.AppManager;
+import com.hrsoftware.comum.ConsumerList;
+import com.jfoenix.controls.JFXComboBox;
+
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableView;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
+
+public class ServicoVeiculoController extends ViewAbstract<ServicoVeiculo> implements Initializable {
+
+	@FXML
+	private Button btnGravar;
+
+	@FXML
+	private Button btnNovo;
+
+	@FXML
+	private Button btnExcluir;
+
+	@FXML
+	private Button btnAdicionar;
+
+	@FXML
+	private Button btnRemover;
+
+	@FXML
+	private JFXComboBox<Cliente> cbxCliente;
+
+	@FXML
+	private JFXComboBox<Veiculo> cbxVeiculo;
+
+	@FXML
+	private JFXComboBox<Servico> cbxServico;
+
+	@FXML
+	private JFXComboBox<StatusDoServico> cbxStatus;
+
+	@FXML
+	private TableView<Servico> tabelaServicos;
+
+	private TableFactory<Servico> factoryServico = new TableFactory<>();
+
+	private ServicoVeiculo servicoVeiculo = null;
+
+	private ServicoDAO servicoDAO = new ServicoDAO();
+
+	private ServicoVeiculoDAO servicoVeiculoDAO = new ServicoVeiculoDAO();
+
+	private VeiculoDAO veiculoDAO = new VeiculoDAO();
+
+	private ClienteDAO clienteDAO = new ClienteDAO();
+
+	private LoadingDialog loadingDialog = null;
+
+	private ConsumerList<ServicoVeiculo> consumer;
+
+	public ServicoVeiculoController() {
+	}
+
+	public ServicoVeiculoController(ServicoVeiculo servicoVeiculo) {
+		this.servicoVeiculo = servicoVeiculo;
+	}
+
+	public ServicoVeiculoController(ConsumerList<ServicoVeiculo> consumer) {
+		this.consumer = consumer;
+	}
+
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+
+		super.configuraViewAbstract(servicoVeiculoDAO, ServicoVeiculo.class);
+
+		loadingDialog = new LoadingDialog();
+		loadingDialog.start(() -> {
+
+			if (servicoVeiculo == null) {
+
+				servicoVeiculo = new ServicoVeiculo();
+				carregaCombos();
+
+				configuraTabela(null);
+
+			} else {
+				configuraTabela(this.servicoVeiculo);
+				preencheCampos(this.servicoVeiculo);
+			}
+
+		});
+
+	}
+
+	private void configuraTabela(ServicoVeiculo servicoVeiculo) {
+
+		if (servicoVeiculo == null) {
+
+			Platform.runLater(() -> {
+				factoryServico.createTable(new ArrayList<Servico>(), tabelaServicos, Servico.class,
+						Comparator.comparing(Servico::getDescricao));
+
+				configuraColunas();
+
+				btnAdicionar.setDisable(true);
+				btnRemover.setDisable(true);
+			});
+
+		} else {
+			Platform.runLater(() -> {
+				desabilitaTabela();
+			});
+		}
+
+	}
+
+	private void configuraColunas() {
+
+		tabelaServicos.getColumns().get(0).setVisible(false);
+		tabelaServicos.getColumns().get(1).setPrefWidth(250);
+		tabelaServicos.getColumns().get(2).setPrefWidth(122);
+
+	}
+
+	private void desabilitaTabela() {
+
+		tabelaServicos.setDisable(true);
+		btnAdicionar.setDisable(true);
+		btnRemover.setDisable(true);
+
+	}
+
+	private void carregaCombos() {
+
+		BusinessClient businessClient = AppManager.getInstance().getUsuario().getBusinessClient();
+
+		List<Cliente> clientes = clienteDAO.seleciona(businessClient);
+
+		List<Servico> servicos = servicoDAO.seleciona(businessClient);
+
+		Platform.runLater(() -> {
+			cbxCliente.getItems().clear();
+			cbxCliente.getSelectionModel().clearSelection();
+			cbxCliente.setItems(FXCollections.observableArrayList(clientes));
+
+			cbxVeiculo.getItems().clear();
+			cbxVeiculo.getSelectionModel().clearSelection();
+			cbxVeiculo.setDisable(true);
+
+			cbxServico.getItems().clear();
+			cbxServico.getSelectionModel().clearSelection();
+			cbxServico.setItems(FXCollections.observableArrayList(servicos));
+
+			cbxStatus.getItems().clear();
+			cbxStatus.getSelectionModel().clearSelection();
+			cbxStatus.setItems(FXCollections
+					.observableArrayList(Arrays.asList(StatusDoServico.ABERTO, StatusDoServico.TERMINADO)));
+
+		});
+
+	}
+
+	/**
+	 * @param servicoVeiculo
+	 */
+	@Override
+	public void preencheCampos(ServicoVeiculo servicoVeiculo) {
+
+		if (servicoVeiculo != null) {
+
+			Platform.runLater(() -> {
+
+				Cliente cliente = servicoVeiculo.getVeiculo().getCliente();
+				cbxCliente.setItems(FXCollections.observableArrayList(cliente));
+				cbxCliente.getSelectionModel().select(0);
+
+				Veiculo veiculo = servicoVeiculo.getVeiculo();
+				cbxVeiculo.setItems(FXCollections.observableArrayList(veiculo));
+				cbxVeiculo.getSelectionModel().select(0);
+
+				Servico servico = servicoVeiculo.getServico();
+				cbxServico.setItems(FXCollections.observableArrayList(servico));
+				cbxServico.getSelectionModel().select(0);
+
+				cbxStatus.setItems(FXCollections.observableArrayList(StatusDoServico.ABERTO));
+				cbxStatus.getSelectionModel().select(0);
+
+			});
+
+		} else {
+			carregaCombos();
+		}
+
+		btnExcluir.setDisable(servicoVeiculo == null ? true : servicoVeiculo.getVeiculo() == null ? true : false);
+		btnGravar
+				.setText(servicoVeiculo == null ? "Gravar" : servicoVeiculo.getVeiculo() == null ? "Gravar" : "Editar");
+	}
+
+	/**
+	 * CONFIGURAÇÃO DAS COLUNAS
+	 */
+	@Override
+	@Deprecated
+	public void configuraColunasTabela() {
+
+	}
+
+	@FXML
+	public void onClose(ActionEvent event) {
+		GerenciadorStage.getInstance().getStage().hide();
+	}
+
+	@FXML
+	public void onMinimize(ActionEvent event) {
+
+		Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+		stage.setIconified(true);
+	}
+
+	@FXML
+
+	public void acaoBotaoGravar(ActionEvent event) {
+
+		loadingDialog = new LoadingDialog();
+		loadingDialog.start(() -> {
+			gravaOuAtualiza();
+		});
+
+	}
+
+	/**
+	 * GRAVA &/OR ATUALIZA
+	 */
+	private void gravaOuAtualiza() {
+
+		Cliente cliente = cbxCliente.getSelectionModel().getSelectedItem();
+		Veiculo veiculo = cbxVeiculo.getSelectionModel().getSelectedItem();
+		Servico servico = cbxServico.getSelectionModel().getSelectedItem();
+		List<Servico> servicos = tabelaServicos.getItems();
+		StatusDoServico statusDoServico = cbxStatus.getSelectionModel().getSelectedItem();
+		FluxoDeCaixa fluxoDeCaixa = new FluxoDeCaixaDAO()
+				.getCaixaAberto(AppManager.getInstance().getUsuario().getBusinessClient());
+
+		if (fluxoDeCaixa == null) {
+			Platform.runLater(() -> {
+				AlertDialog.exibe(AlertType.ERROR, "Caixa Fechado", "Por favor, primeiro abra o caixa");
+			});
+
+			return;
+		}
+
+		System.out.println("AQUI");
+
+		if (existeCamposNulos(cliente, veiculo, servicos, statusDoServico))
+			return;
+
+		System.out.println("DEPOIS");
+
+		if (servicoVeiculo.getId() == null) {
+
+			List<ServicoVeiculo> servicosVeiculos = new ArrayList<>();
+
+			servicos.forEach(s -> {
+
+				ServicoVeiculo servicoVeiculoInterno = new ServicoVeiculo(veiculo, s, statusDoServico, fluxoDeCaixa);
+				servicosVeiculos.add(servicoVeiculoInterno);
+			});
+
+			gravaServicosVeiculos(servicosVeiculos, null);
+
+		} else {
+
+			System.out.println("ATUALIZAR");
+			atualizaServicoVeiculo(veiculo, servico, statusDoServico, fluxoDeCaixa);
+
+			gravaServicosVeiculos(null, this.servicoVeiculo);
+		}
+
+	}
+
+	private void gravaServicosVeiculos(List<ServicoVeiculo> servicoVeiculos, ServicoVeiculo servicoVeiculo) {
+
+		if (servicoVeiculo == null) {
+			gravaServicoVeiculo(servicoVeiculos);
+		} else {
+			atualizaServicoVeiculo(servicoVeiculo);
+		}
+
+	}
+
+	private void atualizaServicoVeiculo(ServicoVeiculo servicoVeiculo) {
+
+		if (gravaOuAtualiza(servicoVeiculo)) {
+			System.out.println("DEU BOM");
+			System.out.println("NOVO");
+			acaoBotaoNovo(null);
+		} else {
+			System.out.println("Voltou");
+			return;
+		}
+
+		List<ServicoVeiculo> servicoVeiculos = new ArrayList<>(Arrays.asList(servicoVeiculo));
+
+		System.out.println("ADICIONA NA TABELA");
+		consumer.accept(servicoVeiculos);
+
+		servicoVeiculo = new ServicoVeiculo();
+
+	}
+
+	private void gravaServicoVeiculo(List<ServicoVeiculo> servicoVeiculos) {
+
+		servicoVeiculos.forEach(sv -> {
+
+			if (gravaOuAtualiza(sv)) {
+				acaoBotaoNovo(null);
+			} else {
+				return;
+			}
+
+		});
+
+		consumer.accept(servicoVeiculos);
+
+		servicoVeiculo = new ServicoVeiculo();
+
+		factoryServico.clearTabela();
+		tabelaServicos.getItems().clear();
+	}
+
+	private void atualizaServicoVeiculo(Veiculo veiculo, Servico servico, StatusDoServico statusDoServico,
+			FluxoDeCaixa fluxoDeCaixa) {
+
+		servicoVeiculo.setVeiculo(veiculo);
+		servicoVeiculo.setServico(servico);
+		servicoVeiculo.setStatusDoServico(statusDoServico);
+		servicoVeiculo.setFluxoDeCaixa(fluxoDeCaixa);
+
+	}
+
+	private boolean existeCamposNulos(Cliente cliente, Veiculo veiculos, List<Servico> servicos,
+			StatusDoServico statusDoServico) {
+
+		if (cliente == null || veiculos == null || servicos.isEmpty() || statusDoServico == null) {
+
+			Platform.runLater(() -> {
+				AlertDialog.exibe(AlertType.ERROR, "Obrigatórios", "Campos obrigatórios não preenchidos");
+			});
+
+			return true;
+		}
+
+		return false;
+	}
+
+	@FXML
+	public void acaoBotaoNovo(ActionEvent event) {
+
+		preencheCampos(null);
+		btnGravar.setText("Gravar");
+
+	}
+
+	@FXML
+	public void acaoBotaoExcluir(ActionEvent event) {
+
+		if (servicoVeiculo == null)
+			return;
+
+		if (!AlertDialog.exibe(AlertType.CONFIRMATION, "Excluir",
+				"Deseja realmente excluir o ServicoVeiculo selecionado ?"))
+			return;
+
+		if (exclui(servicoVeiculo))
+			acaoBotaoNovo(null);
+
+	}
+
+	@FXML
+	public void acaoComboServicos(ActionEvent event) {
+
+		if (servicoVeiculo.getId() != null)
+			return;
+
+		if (cbxServico.getSelectionModel().getSelectedIndex() < 0)
+			return;
+
+		btnAdicionar.setDisable(false);
+
+	}
+
+	@FXML
+	public void acaoComboCliente(ActionEvent event) {
+
+		if (cbxCliente.getSelectionModel().getSelectedIndex() < 0) {
+			return;
+		}
+
+		loadingDialog.start(() -> {
+			Cliente cliente = cbxCliente.getSelectionModel().getSelectedItem();
+
+			List<Veiculo> veiculos = veiculoDAO.seleciona(cliente);
+
+			if (veiculos.isEmpty())
+				return;
+
+			cbxVeiculo.setDisable(false);
+
+			Platform.runLater(() -> {
+				cbxVeiculo.setItems(FXCollections.observableArrayList(veiculos));
+			});
+		});
+
+	}
+
+	@FXML
+	public void acaoBotaoAdicionar(ActionEvent event) {
+
+		Servico servico = cbxServico.getSelectionModel().getSelectedItem();
+
+		if (servico == null)
+			return;
+
+		factoryServico.adicionaItem(servico);
+		cbxServico.getSelectionModel().clearSelection();
+		btnAdicionar.setDisable(true);
+
+	}
+
+	@FXML
+	public void acaoBotaoRemover(ActionEvent event) {
+
+		int index = cbxServico.getSelectionModel().getSelectedIndex();
+
+		if (index < 0)
+			return;
+
+		factoryServico.removeitem(index);
+		btnRemover.setDisable(true);
+	}
+
+	@FXML
+	void acaoTabelaServicos(MouseEvent event) {
+
+		if (cbxServico.getSelectionModel().getSelectedIndex() < 0)
+			return;
+
+		btnRemover.setDisable(false);
+
+	}
+
+}

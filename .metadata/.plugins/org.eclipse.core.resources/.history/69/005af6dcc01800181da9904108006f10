@@ -1,0 +1,361 @@
+package com.hrsoftware.business.view;
+
+import java.net.URL;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ResourceBundle;
+
+import com.hrsoftware.business.BusinessClient;
+import com.hrsoftware.business.Veiculo;
+import com.hrsoftware.business.dao.BusinessClientDAO;
+import com.hrsoftware.business.dao.VeiculoDAO;
+import com.hrsoftware.components.GerenciadorStage;
+import com.hrsoftware.components.LoadingDialog;
+import com.hrsoftware.components.TableFactory;
+import com.hrsoftware.components.alerts.AlertDialog;
+import com.hrsoftware.components.notifications.Notificacao;
+import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXTextField;
+
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableView;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
+import tray.notification.NotificationType;
+
+public class VeiculoController implements Initializable {
+
+	@FXML
+    private JFXTextField txtNome;
+
+    @FXML
+    private JFXTextField txtTelefone;
+
+    @FXML
+    private JFXTextField txtNumero;
+
+    @FXML
+    private TableView<?> tableCadastrados;
+
+    @FXML
+    private Button btnGravar;
+
+    @FXML
+    private Button btnNovo;
+
+    @FXML
+    private Button btnExcluir;
+
+	@FXML
+	private TableView<Veiculo> tableCadastrados;
+
+	private TableFactory<Veiculo> factoryVeiculo = new TableFactory<>();
+
+	private Veiculo veiculo = new Veiculo();
+
+	private Integer index = null;
+
+	private VeiculoDAO veiculoDAO = new VeiculoDAO();
+
+	private LoadingDialog loadingDialog = null;
+
+	private BusinessClient businessClient = null;
+
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+
+		loadingDialog = new LoadingDialog();
+		loadingDialog.start(() -> {
+
+			preencheTabela();
+
+			alimentaCombos();
+
+		});
+		
+		
+	}
+
+	/**
+	 * 
+	 */
+	private void alimentaCombos() {
+		
+		// TODO
+
+	}
+
+	/**
+	 * @param cliente
+	 */
+	private void preencheCampos(Veiculo veiculo) {
+
+		// TODO
+		/*txtNome.setText(cliente == null ? null : cliente.getNome() == null ? null : cliente.getNome());
+		cbxSexo.setValue(cliente == null ? null : cliente.getSexo() == null ? null : cliente.getSexo());
+		txtTelefone.setText(cliente == null ? null : cliente.getTelefone() == null ? null : cliente.getTelefone());
+		txtCep.setText(cliente == null ? null : cliente.getCep() == null ? null : cliente.getCep());
+		txtNumero.setText(cliente == null ? null : cliente.getNumero() == null ? null : cliente.getNumero());
+
+		txtEndereco.setText(cliente == null ? null : cliente.getLogradouro() == null ? null : cliente.getLogradouro());
+		txtBairro.setText(cliente == null ? null : cliente.getBairro() == null ? null : cliente.getBairro());
+		txtCidade.setText(cliente == null ? null : cliente.getCidade() == null ? null : cliente.getCidade());
+		txtEstado.setText(cliente == null ? null : cliente.getEstado() == null ? null : cliente.getEstado());
+
+		btnExcluir.setDisable(cliente == null ? true : cliente.getNome() == null ? true : false);
+		btnGravar.setText(cliente == null ? "Gravar" : cliente.getNome() == null ? "Gravar" : "Editar");*/
+	}
+
+	/**
+	 * CRIA E ALIMENTA AS TABELAS
+	 */
+	private void preencheTabela() {
+
+		BusinessClientDAO dao = new BusinessClientDAO();
+
+		businessClient = dao.getBy(1l);
+
+		List<Veiculo> veiculos = veiculoDAO.seleciona(businessClient);
+
+		Platform.runLater(() -> {
+			factoryVeiculo.createTable(veiculos, tableCadastrados, Veiculo.class,
+					Comparator.comparing(Veiculo::getDataHoraCriacao));
+			configuraColunasTabela();
+		});
+
+	}
+
+	/**
+	 * CONFIGURAÇÃO DAS COLUNAS
+	 */
+	private void configuraColunasTabela() {
+
+		tableCadastrados.getColumns().get(0).setPrefWidth(130);
+		tableCadastrados.getColumns().get(0).setStyle("-fx-alignment: CENTER");
+		tableCadastrados.getColumns().get(1).setPrefWidth(350);
+
+	}
+
+	@FXML
+	public void onClose(ActionEvent event) {
+		GerenciadorStage.getInstance().getStage().hide();
+	}
+
+	@FXML
+	void acaoTabelaCliente(MouseEvent event) {
+
+		veiculo = tableCadastrados.getSelectionModel().getSelectedItem();
+		index = tableCadastrados.getSelectionModel().getSelectedIndex();
+
+		preencheCampos(veiculo);
+
+	}
+
+	@FXML
+	public void onMinimize(ActionEvent event) {
+
+		Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+		stage.setIconified(true);
+	}
+
+	@FXML
+	public void acaoBotaoGravar(ActionEvent event) {
+
+		loadingDialog = new LoadingDialog();
+		loadingDialog.start(() -> {
+			gravaOuAtualiza();
+		});
+
+	}
+
+	/**
+	 * GRAVA &/OR ATUALIZA
+	 */
+	private void gravaOuAtualiza() {
+
+		String nome = txtNome.getText();
+		String sexo = cbxSexo.getSelectionModel().getSelectedItem(); // GET VALUE ACHO QUE PEGA QUALQUER COISA
+		String telefone = txtTelefone.getText();
+		String cep = txtCep.getText();
+		String endereco = txtEndereco.getText();
+		String numero = txtNumero.getText();
+		String bairro = txtBairro.getText();
+		String cidade = txtCidade.getText();
+		String estado = txtEstado.getText();
+
+		System.out.println("SEGUNDO");
+
+		if (existeCamposNulos(nome, sexo, telefone, cep, endereco, bairro, cidade, estado))
+			return;
+
+		nome = trocaParaMaiusculaPrimeiraLetraNome(nome);
+
+		if (veiculo.getId() == null) {
+			
+			System.out.println("GRAVAR");
+			veiculo = new Veiculo(nome, sexo, telefone, cep, endereco, numero, bairro, cidade, estado);
+			
+		} else {
+			System.out.println("ATUALIZAR");
+			atualizaVeiculo(nome, sexo, telefone, cep, endereco, numero, bairro, cidade, estado);
+		}
+
+		if (veiculo.getId() == null) {
+			gravaVeiculo();
+
+			Platform.runLater(() -> {
+				acaoBotaoNovo(null);
+			});
+		} else {
+			atualizaVeiculo();
+
+			Platform.runLater(() -> {
+				acaoBotaoNovo(null);
+			});
+		}
+
+	}
+
+	private void atualizaVeiculo(String nome, String sexo, String telefone, String cep, String endereco, String numero,
+			String bairro, String cidade, String estado) {
+
+		// TODO
+		/*veiculo.setNome(nome);
+		veiculo.setSexo(sexo);
+		veiculo.setTelefone(telefone);
+		veiculo.setCep(cep);
+		veiculo.setLogradouro(endereco);
+		veiculo.setNumero(numero);
+		veiculo.setBairro(bairro);
+		veiculo.setCidade(cidade);
+		veiculo.setEstado(estado);*/
+
+	}
+
+	private String trocaParaMaiusculaPrimeiraLetraNome(String nome) {
+
+		String primeiraLetraNome = nome.substring(0, 1);
+		return nome.replaceFirst(primeiraLetraNome, primeiraLetraNome.toUpperCase());
+
+	}
+
+	/**
+	 * 
+	 */
+	private void gravaVeiculo() {
+
+		Notificacao notificacao = null;
+
+		if (veiculoDAO.insere(veiculo) != null) {
+
+			notificacao = new Notificacao("Clientes", "Cliente gravado com sucesso.", NotificationType.SUCCESS);
+			notificacao.mostraNotificacao();
+
+		} else {
+
+			notificacao = new Notificacao("Clientes", "Erro ao gravar o cliente, por favor tente mais tarde.",
+					NotificationType.ERROR);
+			notificacao.mostraNotificacao();
+
+			return;
+		}
+
+		Platform.runLater(() -> {
+			factoryVeiculo.adicionaItem(veiculo);
+		});
+
+	}
+
+	private void atualizaVeiculo() {
+
+		Notificacao notificacao = null;
+
+		if (veiculoDAO.atualizaObjeto(veiculo) != null) {
+			notificacao = new Notificacao("Veiculos", "Veiculo atualizado com sucesso.", NotificationType.SUCCESS);
+			notificacao.mostraNotificacao();
+		} else {
+			notificacao = new Notificacao("Veiculos", "Erro ao atualizar o veiculo, por favor tente mais tarde.",
+					NotificationType.ERROR);
+			notificacao.mostraNotificacao();
+		}
+
+		Platform.runLater(() -> {
+			factoryVeiculo.atualizaItem(veiculo, index);
+		});
+
+	}
+
+	/**
+	 * @param nome
+	 * @param sexo
+	 * @param telefone
+	 * @param cep
+	 * @param endereco
+	 * @param bairro
+	 * @param cidade
+	 * @param estado
+	 * @return
+	 */
+	private boolean existeCamposNulos(String nome, String sexo, String telefone, String cep, String endereco,
+			String bairro, String cidade, String estado) {
+
+		// TODO
+		/*if (nome == null || sexo == null || telefone == null || endereco == null || bairro == null || cidade == null
+				|| estado == null) {
+
+			System.out.println("ALERTA");
+			AlertDialog.exibe(AlertType.ERROR, "Obrigatórios", "Campos obrigatórios não preenchidos");
+
+			return true;
+		}*/
+
+		return false;
+	}
+
+	@FXML
+	public void acaoBotaoNovo(ActionEvent event) {
+		preencheCampos(null);
+		btnGravar.setText("Gravar");
+
+		veiculo = new Veiculo();
+	}
+
+	@FXML
+	public void acaoBotaoExcluir(ActionEvent event) {
+
+		if (veiculo == null)
+			return;
+		
+		if (!AlertDialog.exibe(AlertType.CONFIRMATION, "Excluir", "Deseja realmente excluir o Veiculo selecionado ?"))
+			return;
+		
+		if (veiculoDAO.remove(veiculo.getId())) {
+
+			factoryVeiculo.removeitem(index);
+
+			// EXIBE NOTIFICAÇÃO
+			Notificacao notificacao = new Notificacao("Veiculo", "Veiculo excluido com sucesso",
+					NotificationType.INFORMATION);
+			notificacao.mostraNotificacao();
+
+		} else {
+
+			// EXIBE NOTIFICAÇÃO
+			Notificacao notificacao = new Notificacao("Veiculo",
+					"Impossível excluir o Veiculo selecionado, por favor tente mais tarde", NotificationType.ERROR);
+			notificacao.mostraNotificacao();
+
+			return;
+		}
+
+		acaoBotaoNovo(null);
+
+	}
+
+}

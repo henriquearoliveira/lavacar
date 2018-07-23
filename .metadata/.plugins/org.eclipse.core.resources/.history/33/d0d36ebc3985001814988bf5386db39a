@@ -1,0 +1,205 @@
+package com.hrsoftware.business.view;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import com.hrsoftware.GerenciadorStage;
+import com.hrsoftware.business.FluxoDeCaixa;
+import com.hrsoftware.business.Lancamento;
+import com.hrsoftware.business.ServicoVeiculo;
+import com.hrsoftware.business.TipoDeLancamento;
+import com.hrsoftware.business.dao.FluxoDeCaixaDAO;
+import com.hrsoftware.business.dao.LancamentoDAO;
+import com.hrsoftware.business.dao.ServicoVeiculoDAO;
+import com.hrsoftware.components.LoadingDialog;
+import com.hrsoftware.components.TipoController;
+import com.hrsoftware.components.alerts.AlertDialog;
+import com.hrsoftware.components.notifications.Notificacoes;
+import com.hrsoftware.comum.AppManager;
+import com.hrsoftware.dashboard.PrincipalController;
+
+import javafx.application.Platform;
+import javafx.scene.control.Alert.AlertType;
+
+public class FluxoDeCaixaFacade {
+
+	private FecharCaixaController controller;
+
+	private ServicoVeiculoDAO servicoVeiculoDAO = new ServicoVeiculoDAO();
+
+	public FluxoDeCaixaFacade(FecharCaixaController controller) {
+		this.controller = controller;
+	}
+
+	private FluxoDeCaixaDAO fluxoDeCaixaDAO = new FluxoDeCaixaDAO();
+
+	private LoadingDialog loadingDialog = new LoadingDialog();
+
+	private BigDecimal valor = null;
+
+	public void fechaCaixa() {
+
+		boolean resposta = AlertDialog.exibe(AlertType.CONFIRMATION, "Fechar Caixa",
+				"Tem certeza que deseja fechar o caixa ?");
+
+		if (resposta)
+			fazFechamentoLancamentosServicos();
+	}
+
+	private void fazFechamentoLancamentosServicos() {
+
+		GerenciadorStage.getInstance().showPopupUndecorated("business/view/FecharCaixa.fxml", "Fechamento");
+
+	}
+
+	public void gravaFechamento(BigDecimal totalFechamento, FluxoDeCaixa fluxoDeCaixa,
+			List<ServicoVeiculo> servicoVeiculoAbertos) {
+
+		if (totalFechamento == null || fluxoDeCaixa == null)
+			return;
+
+		fluxoDeCaixa.setFechado(true);
+		fluxoDeCaixa.setValorTotal(totalFechamento);
+
+		if (fluxoDeCaixaDAO.atualizaObjeto(fluxoDeCaixa) != null) {
+
+			if (servicoVeiculoAbertos == null) {
+
+				mensagemCaixaFechadoSucesso();
+
+				Platform.runLater(() -> {
+					controller.configuraJanelaCaixaFechado(false);
+				});
+
+				return;
+
+			} else {
+
+				if (!criaNovoFluxoCaixa(servicoVeiculoAbertos)) {
+					falhaFecharCaixa();
+					return;
+				}
+
+				mensagemCaixaFechadoSucesso();
+
+				Platform.runLater(() -> {
+					controller.configuraJanelaCaixaFechado(true);
+				});
+
+			}
+
+		} else {
+			falhaFecharCaixa();
+		}
+
+	}
+
+	private void mensagemCaixaFechadoSucesso() {
+		Notificacoes.getInstance().mostraCurta(null, "Caixa fechado com sucesso.");
+	}
+
+	private void falhaFecharCaixa() {
+		Notificacoes.getInstance().mostraCurta(null, "Falha ao fechar, por favor tente mais tarde.");
+	}
+
+	private boolean criaNovoFluxoCaixa(List<ServicoVeiculo> servicoVeiculoAbertos) {
+
+		FluxoDeCaixa fluxoDeCaixa = new FluxoDeCaixa();
+		fluxoDeCaixa.setBusinessClient(AppManager.getInstance().getUsuario().getBusinessClient());
+		fluxoDeCaixa.setFechado(false);
+
+		if (fluxoDeCaixaDAO.insere(fluxoDeCaixa) != null) {
+			atualizaServicoVeiculos(fluxoDeCaixa, servicoVeiculoAbertos);
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
+	private void atualizaServicoVeiculos(FluxoDeCaixa fluxoDeCaixa, List<ServicoVeiculo> servicoVeiculoAbertos) {
+
+		servicoVeiculoAbertos.forEach(sv -> {
+
+			sv.setFluxoDeCaixa(fluxoDeCaixa);
+			if (servicoVeiculoDAO.atualizaObjeto(sv) == null) {
+				falhaFecharCaixa();
+				return;
+			}
+
+		});
+
+	}
+
+	// ------------------------------ // ------------------------------------ //
+
+	public void abreCaixa() {
+
+		boolean resposta = AlertDialog.exibe(AlertType.CONFIRMATION, "Abrir Caixa",
+				"Tem certeza que deseja abrir o caixa ?");
+
+		if (resposta) {
+			abreCaixalancamentosServicos();
+		}
+	}
+
+	private void abreCaixalancamentosServicos() {
+
+		String txtValor = AlertDialog.exibeInput("Troco", "Contem troco ? :");
+
+		valor = null;
+
+		try {
+			valor = new BigDecimal(txtValor.replaceAll(",", "."));
+		} catch (Exception e) {
+			abreCaixalancamentosServicos();
+		}
+
+		loadingDialog.start(() -> {
+			insereFluxoDeCaixaLancamento(valor);
+		});
+
+	}
+
+	private void insereFluxoDeCaixaLancamento(BigDecimal valor) {
+
+		FluxoDeCaixa fluxoDeCaixa = new FluxoDeCaixa();
+		fluxoDeCaixa.setBusinessClient(AppManager.getInstance().getUsuario().getBusinessClient());
+		fluxoDeCaixa.setFechado(false);
+		fluxoDeCaixa.setValorTotal(null);
+
+		if (fluxoDeCaixaDAO.insere(fluxoDeCaixa) != null) {
+
+			System.out.println("ID FLUXO DE CAIXA");
+			System.out.println(fluxoDeCaixa.getId());
+
+			if (valor != null) {
+				insereLancamento(fluxoDeCaixa, valor);
+				PrincipalController principalController = (PrincipalController) GerenciadorStage.getInstance()
+						.getController(TipoController.PRINCIPAL_CONTROLLER);
+				principalController.configuraCaixaBotao(false);
+			}
+
+			// AppManager.getInstance().setFluxoDeCaixa(fluxoDeCaixa);
+		} else {
+			Notificacoes.getInstance().mostraCurta(null, "Impossível abrir o caixa, tente mais tarde");
+		}
+
+	}
+
+	private void insereLancamento(FluxoDeCaixa fluxoDeCaixa, BigDecimal valorTroco) {
+
+		Lancamento lancamento = new Lancamento();
+		lancamento.setDescricao("Troco");
+		lancamento.setTipoDeLancamento(TipoDeLancamento.RECEITA);
+		lancamento.setValor(valorTroco);
+		lancamento.setFluxoDeCaixa(fluxoDeCaixa);
+
+		if (new LancamentoDAO().insere(lancamento) != null) {
+			Notificacoes.getInstance().mostraCurta(null, "Caixa aberto com sucesso");
+		} else {
+			Notificacoes.getInstance().mostraCurta(null, "Falha ao Abrir o Caixa, tente mais tarde.");
+		}
+	}
+
+}

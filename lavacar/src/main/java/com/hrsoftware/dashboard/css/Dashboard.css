@@ -1,0 +1,29 @@
+/* bpPrincipal */
+#stkpPrincipal{ 
+    -fx-background-image: url("../images/dashboardlight.png");
+    -fx-background-repeat: stretch;
+    /*-fx-background-size: 900 506;*/
+    -fx-background-color:transparent;
+    -fx-background-position: center center;
+    /*-fx-opacity: 0.3;*/
+    /*-fx-effect: dropshadow(three-pass-box, black, 30, 0.5, 0, 0);*/ 
+}
+
+/*.notification-bar>.pane {
+    -fx-background-color: red, yellow, blue;
+    -fx-padding: 5 5 5 5;
+    -fx-background-insets: 0, 1, 2;
+}
+
+.notification-bar>.pane .title {
+    -fx-font-size: 1.333em;
+    -fx-text-fill: #000;
+    -fx-font-weight: bold;
+    -fx-font-color: #8ae234;
+}
+
+.notification-bar>.pane .label {
+    -fx-font-size: 1em;
+    -fx-text-fill: #000;
+    -fx-alignment: top-left;
+}*/

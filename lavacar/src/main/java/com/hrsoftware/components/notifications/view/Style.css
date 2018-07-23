@@ -1,0 +1,10 @@
+.campo_obrigatorio {
+	-fx-border-color: #5f3730;
+	-fx-border-width: 0 0 0 5px;
+}
+
+.tab_background {
+	-fx-background-image: url("tab/background.png");
+	-fx-background-repeat: no-repeat;
+	-fx-background-size: 100% 100%;
+}

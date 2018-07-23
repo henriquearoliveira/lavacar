@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXPasswordField?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="apLogin" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseDragged="#mouseDragged" onMousePressed="#mousePressed" prefHeight="353.0" prefWidth="327.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hrsoftware.login.LoginController">
+   <children>
+      <Pane layoutX="21.0" layoutY="30.0" prefHeight="314.0" prefWidth="294.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
+         <children>
+            <Button fx:id="btnLogin" layoutX="174.0" layoutY="263.0" mnemonicParsing="false" onAction="#loginAction" prefHeight="25.0" prefWidth="91.0" text="Entrar">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+            <Label fx:id="idUsuarioSenhaIncorreto" layoutX="30.0" layoutY="274.0" text="Esqueceu a senha ?" underline="true">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Label>
+            <JFXTextField fx:id="username" alignment="CENTER" labelFloat="true" layoutX="29.0" layoutY="169.0" prefHeight="26.0" prefWidth="236.0" promptText="Usuario" />
+            <JFXPasswordField fx:id="password" alignment="CENTER" labelFloat="true" layoutX="29.0" layoutY="212.0" prefHeight="26.0" prefWidth="236.0" promptText="Senha" />
+            <ImageView fitHeight="147.0" fitWidth="228.0" layoutX="46.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/lava-rapido.gif" />
+               </image>
+            </ImageView>
+         </children>
+      </Pane>
+      <Group layoutX="308.0" AnchorPane.rightAnchor="0.0">
+         <children>
+            <Button layoutX="27.0" mnemonicParsing="false" onAction="#onClose" style="-fx-background-color: transparent;">
+               <graphic>
+                  <MaterialDesignIconView glyphName="WINDOW_CLOSE" size="14" />
+               </graphic>
+            </Button>
+            <Button alignment="BOTTOM_CENTER" layoutY="2.0" mnemonicParsing="false" onAction="#onMinimize" style="-fx-background-color: transparent;">
+               <graphic>
+                  <MaterialDesignIconView glyphName="WINDOW_MINIMIZE" size="14" />
+               </graphic>
+            </Button>
+         </children>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Group>
+      <Label fx:id="idUsuarioSenhaIncorreto" layoutX="85.0" layoutY="349.0" text="Usuario e/ou senha incorretos" textFill="RED" visible="false">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.effect.Glow?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="bpPrincipal" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="680.0" minWidth="1100.0" prefHeight="680.0" prefWidth="1100.0" style="-fx-background-image: url(&quot;fundoefeito.png&quot;);" stylesheets="@../css/Dashboard.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hrsoftware.dashboard.PrincipalController">
+   <center>
+      <StackPane fx:id="stkpPrincipal" prefHeight="680.0" prefWidth="1100.0" BorderPane.alignment="CENTER" />
+   </center>
+   <left>
+      <AnchorPane fx:id="painelInicio" prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: #b6e8ef;" stylesheets="@../css/LabelMenuInicio.css" BorderPane.alignment="CENTER">
+         <children>
+            <Label layoutX="71.0" layoutY="39.0" prefHeight="35.0" prefWidth="200.0" style="-fx-background-color: #D3D3D3;" text="Cadastro" textAlignment="CENTER" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="15.0">
+               <font>
+                  <Font size="17.0" />
+               </font>
+               <effect>
+                  <Glow />
+               </effect>
+               <graphic>
+                  <MaterialDesignIconView fill="#005dff" glyphName="CONTENT_SAVE" size="14.0" />
+               </graphic>
+               <padding>
+                  <Insets left="35.0" />
+               </padding>
+            </Label>
+            <Label layoutX="7.0" layoutY="141.0" prefHeight="30.0" prefWidth="78.0" style="-fx-background-color: #D3D3D3;" text="Caixa" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+               <font>
+                  <Font size="17.0" />
+               </font>
+               <effect>
+                  <Glow />
+               </effect>
+               <graphic>
+                  <MaterialDesignIconView fill="#08a80d" glyphName="CURRENCY_USD" size="18" />
+               </graphic>
+               <padding>
+                  <Insets left="35.0" />
+               </padding>
+            </Label>
+            <Label fx:id="menuCadCarros" layoutX="7.0" layoutY="81.0" onMouseClicked="#acaoCadastroVeiculo" prefHeight="30.0" prefWidth="198.0" text="Veiculos" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+               <padding>
+                  <Insets left="15.0" />
+               </padding>
+               <graphic>
+                  <MaterialDesignIconView glyphName="CAR" />
+               </graphic>
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="menuCadServicos" layoutX="7.0" layoutY="111.0" onMouseClicked="#acaoCadastroServico" prefHeight="30.0" prefWidth="198.0" text="Serviços" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+               <padding>
+                  <Insets left="15.0" />
+               </padding>
+               <graphic>
+                  <MaterialDesignIconView glyphName="WATER_PUMP" />
+               </graphic>
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <Label layoutX="7.0" layoutY="230.0" prefHeight="30.0" style="-fx-background-color: #D3D3D3;" text="Relatorios" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+               <graphic>
+                  <MaterialDesignIconView fill="RED" glyphName="CLIPBOARD_TEXT" size="14" />
+               </graphic>
+               <padding>
+                  <Insets left="35.0" />
+               </padding>
+               <effect>
+                  <Glow />
+               </effect>
+               <font>
+                  <Font size="17.0" />
+               </font>
+            </Label>
+            <Label fx:id="menuCadCliente" layoutX="7.0" layoutY="51.0" onMouseClicked="#acaoCadastroCliente" prefHeight="30.0" prefWidth="198.0" text="Clientes" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+               <padding>
+                  <Insets left="15.0" />
+               </padding>
+               <graphic>
+                  <MaterialDesignIconView glyphName="ACCOUNT_MULTIPLE" size="17" />
+               </graphic>
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="menuCaixaFinaliza" layoutX="7.0" layoutY="201.0" onMouseClicked="#acaoFechamentoCaixa" prefHeight="30.0" prefWidth="180.0" text="Fechar Caixa" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+               <padding>
+                  <Insets left="15.0" />
+               </padding>
+               <graphic>
+                  <MaterialDesignIconView glyphName="CHECK_ALL" size="16" />
+               </graphic>
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="menuCadLancamento" layoutX="7.0" layoutY="171.0" onMouseClicked="#acaoCadastroLancamento" prefHeight="30.0" prefWidth="198.0" text="Lançamentos" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+               <padding>
+                  <Insets left="15.0" />
+               </padding>
+               <graphic>
+                  <MaterialDesignIconView glyphName="BASKET_FILL" />
+               </graphic>
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="relatorioFluxoCaixa" layoutX="7.0" layoutY="260.0" onMouseClicked="#acaoRelatorioFluxoCaixa" prefHeight="30.0" prefWidth="180.0" text="Fecham. Caixa" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+               <padding>
+                  <Insets left="15.0" />
+               </padding>
+               <graphic>
+                  <MaterialDesignIconView glyphName="CALENDAR_TODAY" size="16" />
+               </graphic>
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="relatorioFluxoCaixaPeriodo" layoutX="10.0" layoutY="290.0" onMouseClicked="#acaoRelatorioFluxoCaixaPeriodo" prefHeight="30.0" prefWidth="180.0" text="Fecham. Periodo" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+               <padding>
+                  <Insets left="15.0" />
+               </padding>
+               <graphic>
+                  <MaterialDesignIconView glyphName="AV_TIMER" size="17" />
+               </graphic>
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+   </left>
+   <top>
+      <MenuBar nodeOrientation="RIGHT_TO_LEFT" BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="Configurações">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Meu Cadastro" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+</BorderPane>

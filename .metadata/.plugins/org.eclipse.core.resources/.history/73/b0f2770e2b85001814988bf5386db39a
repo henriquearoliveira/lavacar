@@ -1,0 +1,110 @@
+package com.hrsoftware.relatorios;
+
+import java.sql.Connection;
+import java.util.List;
+import java.util.Map;
+
+import org.hibernate.Session;
+
+import com.hrsoftware.components.alerts.AlertDialog;
+import com.hrsoftware.dao.JpaUtil;
+import com.hrsoftware.ftp.FTPRetrieveFile;
+import com.hrsoftware.utilitario.Ferramentas;
+
+import javafx.application.Platform;
+import javafx.scene.control.Alert.AlertType;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
+
+public class Relatori/oBuilder {
+
+	private JasperViewer viewer = null;
+
+	private Connection connection = null;
+
+	public RelatorioBuilder criaRelatorio(Map<String, Object> params, RelatoriosCaminho relatorios) {
+
+		List<String> listaRelatorios = relatorios.getRelatorios(relatorios);
+
+		listaRelatorios.forEach(r -> {
+			downloadRelatorioFTP(r);
+		});
+
+		Session session = JpaUtil.getInstance().getEntityManager().unwrap(Session.class);
+
+		session.doWork(con -> {
+			connection = con;
+		});
+
+		System.out.println("NULL");
+		System.out.println(connection == null);
+
+		JasperPrint print = null;
+
+		String caminhoLocal = Ferramentas.getCaminhoLocal(listaRelatorios.get(0));
+
+		try {
+			print = JasperFillManager.fillReport(FTPRetrieveFile.getPathDownloads() + caminhoLocal + ".jasper", params,
+					connection);
+		} catch (JRException e) {
+			e.printStackTrace();
+		}
+
+		if (print == null) {
+			Platform.runLater(() -> {
+				AlertDialog.exibe(AlertType.ERROR, "Relatórios", "Caminho do relatório inválido.");
+			});
+			return this;
+		}
+
+		if (print.getPages().isEmpty()) {
+			Platform.runLater(() -> {
+				AlertDialog.exibe(AlertType.ERROR, "Relatórios", "Relatório não contém páginas.");
+			});
+			return this;
+		}
+
+		viewer = new JasperViewer(print, false);
+
+		return this;
+
+	}
+
+	private void downloadRelatorioFTP(String relatorio) {
+
+		FTPRetrieveFile ftp = new FTPRetrieveFile();
+
+		ftp.download(relatorio + ".jasper");
+
+	}
+
+	public Factory build() {
+		return new Factory(this);
+	}
+
+	public JasperViewer getViewer() {
+		return viewer;
+	}
+}
+
+class Factory implements Relatorio {
+
+	private RelatorioBuilder builder;
+
+	public Factory(RelatorioBuilder builder) {
+
+		this.builder = builder;
+	}
+
+	@Override
+	public void exibeRelatorio() {
+
+		if (builder.getViewer() == null) {
+			return;
+		}
+		
+		builder.getViewer().setVisible(true);
+	}
+}

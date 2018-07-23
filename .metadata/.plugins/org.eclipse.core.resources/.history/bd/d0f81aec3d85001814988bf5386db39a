@@ -1,0 +1,263 @@
+package com.hrsoftware.business.view;
+
+import java.net.URL;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ResourceBundle;
+
+import com.hrsoftware.GerenciadorStage;
+import com.hrsoftware.business.Cliente;
+import com.hrsoftware.business.Veiculo;
+import com.hrsoftware.business.dao.ClienteDAO;
+import com.hrsoftware.business.dao.VeiculoDAO;
+import com.hrsoftware.components.LoadingDialog;
+import com.hrsoftware.components.TableFactory;
+import com.hrsoftware.components.alerts.AlertDialog;
+import com.hrsoftware.comum.AppManager;
+import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXTextField;
+
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableView;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
+
+public class VeiculoController extends ViewAbstract<Veiculo> implements Initializable {
+
+	@FXML
+	private JFXTextField txtNome;
+
+	@FXML
+	private JFXTextField txtPlaca;
+
+	@FXML
+	private JFXTextField txtCor;
+
+	@FXML
+	private JFXComboBox<Cliente> cbxCliente;
+
+	@FXML
+	private TableView<Veiculo> tableCadastrados;
+
+	@FXML
+	private Button btnGravar;
+
+	@FXML
+	private Button btnNovo;
+
+	@FXML
+	private Button btnExcluir;
+
+	private TableFactory<Veiculo> factoryVeiculo = new TableFactory<>();
+
+	private Veiculo veiculo = new Veiculo();
+
+	private VeiculoDAO veiculoDAO = new VeiculoDAO();
+
+	private ClienteDAO clienteDAO = new ClienteDAO();
+
+	private LoadingDialog loadingDialog = null;
+
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+
+		super.configuraViewAbstract(veiculoDAO, tableCadastrados, factoryVeiculo, Veiculo.class);
+
+		loadingDialog = new LoadingDialog();
+		loadingDialog.start(() -> {
+
+			preencheTabela();
+
+			carregaCombo();
+
+		});
+
+	}
+
+	/**
+	 *
+	 */
+	private void carregaCombo() {
+
+		List<Cliente> clientes = clienteDAO.seleciona(AppManager.getInstance().getUsuario().getBusinessClient());
+
+		cbxCliente.setItems(FXCollections.observableArrayList(clientes));
+
+	}
+
+	/**
+	 * @param veiculo
+	 */
+	@Override
+	public void preencheCampos(Veiculo veiculo) {
+
+		if (veiculo != null) {
+			cbxCliente.setValue(veiculo.getCliente());
+			cbxCliente.getSelectionModel().select(0);
+		} else {
+			cbxCliente.getItems().clear();
+			carregaCombo();
+		}
+
+		txtNome.setText(veiculo == null ? null : veiculo.getNome());
+		txtPlaca.setText(veiculo == null ? null : veiculo.getPlaca());
+		txtCor.setText(veiculo == null ? null : veiculo.getCor());
+
+		btnExcluir.setDisable(veiculo == null || veiculo.getNome() == null);
+		btnGravar.setText(veiculo == null ? "Gravar" : veiculo.getNome() == null ? "Gravar" : "Editar");
+	}
+
+	/**
+	 * CRIA E ALIMENTA AS TABELAS
+	 */
+	private void preencheTabela() {
+
+//		List<Veiculo> veiculos = veiculoDAO.seleciona(AppManager.getInstance().getUsuario().getBusinessClient());
+
+//		preencheTabela(veiculos, Comparator.comparing(Veiculo::getNome));
+
+	}
+
+	/**
+	 * CONFIGURAÇÃO DAS COLUNAS
+	 */
+	@Override
+	public void configuraColunasTabela() {
+
+		tableCadastrados.getColumns().get(0).setPrefWidth(130);
+		tableCadastrados.getColumns().get(0).setStyle("-fx-alignment: CENTER");
+		tableCadastrados.getColumns().get(1).setPrefWidth(350);
+		tableCadastrados.getColumns().get(2).setPrefWidth(118);
+		tableCadastrados.getColumns().get(2).setStyle("-fx-alignment: CENTER-RIGHT");
+
+	}
+
+	@FXML
+	public void onClose(ActionEvent event) {
+		GerenciadorStage.getInstance().getStage().hide();
+	}
+
+	@FXML
+	void acaoTabelaCliente(MouseEvent event) {
+
+		veiculo = tableCadastrados.getSelectionModel().getSelectedItem();
+
+		acaoTabelaCadastrados(veiculo);
+
+	}
+
+	@FXML
+	public void onMinimize(ActionEvent event) {
+
+		Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+		stage.setIconified(true);
+	}
+
+	@FXML
+	public void acaoBotaoGravar(ActionEvent event) {
+
+		loadingDialog = new LoadingDialog();
+		loadingDialog.start(() -> {
+			gravaOuAtualiza();
+		});
+
+	}
+
+	/**
+	 * GRAVA &/OR ATUALIZA
+	 */
+	private void gravaOuAtualiza() {
+
+		String nome = txtNome.getText();
+		String placa = txtPlaca.getText();
+		String cor = txtCor.getText();
+		Cliente cliente = cbxCliente.getSelectionModel().getSelectedItem();
+
+		if (existeCamposNulos(nome, placa, cliente))
+			return;
+
+		nome = trocaParaMaiusculaPrimeiraLetraNome(nome);
+
+		if (veiculo.getId() == null) {
+			veiculo = new Veiculo(cliente, nome, placa, cor);
+		} else {
+			atualizaVeiculo(cliente, nome, placa, cor);
+		}
+
+		if (gravaOuAtualiza(veiculo)) {
+			Platform.runLater(() -> {
+				acaoBotaoNovo(null);
+			});
+		}
+
+	}
+
+	private void atualizaVeiculo(Cliente cliente, String nome, String placa, String cor) {
+
+		veiculo.setNome(nome);
+		veiculo.setCliente(cliente);
+		veiculo.setPlaca(placa);
+		veiculo.setCor(cor);
+
+	}
+
+	private String trocaParaMaiusculaPrimeiraLetraNome(String nome) {
+
+		String primeiraLetraNome = nome.substring(0, 1);
+		return nome.replaceFirst(primeiraLetraNome, primeiraLetraNome.toUpperCase());
+
+	}
+
+	/**
+	 * @param nome
+	 * @param placa
+	 * @param cliente
+	 * @return
+	 */
+	private boolean existeCamposNulos(String nome, String placa, Cliente cliente) {
+
+		if (nome == null || nome.isEmpty() || placa == null || placa.isEmpty() || cliente == null) {
+
+			Platform.runLater(() -> {
+				AlertDialog.exibe(AlertType.ERROR, "Obrigatórios", "Campos obrigatórios não preenchidos");
+			});
+
+			return true;
+		}
+
+		return false;
+	}
+
+	@FXML
+	public void acaoBotaoNovo(ActionEvent event) {
+
+		preencheCampos(null);
+		btnGravar.setText("Gravar");
+
+		veiculo = new Veiculo();
+
+		factoryVeiculo.clearTabela();
+	}
+
+	@FXML
+	public void acaoBotaoExcluir(ActionEvent event) {
+
+		if (veiculo == null)
+			return;
+
+		if (!AlertDialog.exibe(AlertType.CONFIRMATION, "Excluir", "Deseja realmente excluir o Veiculo selecionado ?"))
+			return;
+
+		if (exclui(veiculo))
+			acaoBotaoNovo(null);
+
+	}
+
+}

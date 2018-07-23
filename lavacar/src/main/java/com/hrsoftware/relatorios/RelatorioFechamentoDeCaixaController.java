@@ -1,0 +1,128 @@
+package com.hrsoftware.relatorios;
+
+import java.net.URL;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+import com.hrsoftware.GerenciadorStage;
+import com.hrsoftware.business.FluxoDeCaixa;
+import com.hrsoftware.business.dao.FluxoDeCaixaDAO;
+import com.hrsoftware.business.view.ViewAbstract;
+import com.hrsoftware.components.LoadingDialog;
+import com.hrsoftware.components.TableFactory;
+import com.hrsoftware.comum.AppManager;
+
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableView;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
+
+public class RelatorioFechamentoDeCaixaController extends ViewAbstract<FluxoDeCaixa> implements Initializable {
+
+	@FXML
+	private Button btnImprimir;
+
+	@FXML
+	private TableView<FluxoDeCaixa> tableCadastrados;
+
+	private FluxoDeCaixaDAO fluxoDeCaixaDAO = new FluxoDeCaixaDAO();
+
+	private TableFactory<FluxoDeCaixa> factoryFluxoDeCaixa = new TableFactory<>();
+
+	private LoadingDialog loadingDialog = new LoadingDialog();
+
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+
+		super.configuraViewAbstract(fluxoDeCaixaDAO, tableCadastrados, factoryFluxoDeCaixa, FluxoDeCaixa.class);
+
+		loadingDialog = new LoadingDialog();
+		loadingDialog.start(() -> {
+
+			preencheTabela();
+			btnImprimir.setDisable(true);
+
+		});
+
+	}
+
+	/**
+	 *
+	 */
+	private void preencheTabela() {
+
+		List<FluxoDeCaixa> fluxoDeCaixas = fluxoDeCaixaDAO
+				.seleciona(AppManager.getInstance().getUsuario().getBusinessClient());
+
+		preencheTabela(fluxoDeCaixas, Comparator.comparing(FluxoDeCaixa::getDataHoraCriacao).reversed());
+
+	}
+
+	@Override
+	public void configuraColunasTabela() {
+
+		tableCadastrados.getColumns().get(0).setPrefWidth(170);
+		tableCadastrados.getColumns().get(0).setStyle("-fx-alignment: CENTER");
+		tableCadastrados.getColumns().get(1).setPrefWidth(146);
+		tableCadastrados.getColumns().get(1).setStyle("-fx-alignment: CENTER-RIGHT");
+
+	}
+
+	@Override
+	@Deprecated
+	public void preencheCampos(FluxoDeCaixa objeto) {
+
+	}
+
+	@FXML
+	void acaoBotaoImprimir(ActionEvent event) {
+
+		new LoadingDialog().start(() -> {
+			exibeRealatorio();
+		});
+
+	}
+
+	private void exibeRealatorio() {
+
+		FluxoDeCaixa fluxoDeCaixa = tableCadastrados.getSelectionModel().getSelectedItem();
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("idFluxoDeCaixa", fluxoDeCaixa.getId());
+
+		Relatorio relatorio = new RelatorioBuilder().criaRelatorio(params, RelatoriosCaminho.FECHAMENTO_CAIXA).build();
+//		relatorio.exibeRelatorio();
+		relatorio.exportPDF();
+
+	}
+
+	@FXML
+	void acaoTabelaCaixasFinalizados(MouseEvent event) {
+
+		if (tableCadastrados.getSelectionModel().getSelectedIndex() >= 0) {
+			btnImprimir.setDisable(false);
+		} else {
+			btnImprimir.setDisable(true);
+		}
+
+	}
+
+	@FXML
+	void onClose(ActionEvent event) {
+		GerenciadorStage.getInstance().getStage().hide();
+	}
+
+	@FXML
+	void onMinimize(ActionEvent event) {
+		Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+		stage.setIconified(true);
+	}
+
+}

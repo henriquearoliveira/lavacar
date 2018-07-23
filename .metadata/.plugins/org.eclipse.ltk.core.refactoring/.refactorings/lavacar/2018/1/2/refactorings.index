@@ -1,0 +1,5 @@
+1515431147310	Copy file
+1515672410897	Move compilation unit
+1515672446378	Rename type 'HibernateUtil'
+1515672453803	Rename type 'JPAUtil'
+1515673792991	Extract method 'closeOperations'

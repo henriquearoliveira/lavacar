@@ -1,0 +1,373 @@
+package com.hrsoftware.dashboard;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ResourceBundle;
+
+import com.hrsoftware.GerenciadorStage;
+import com.hrsoftware.business.ServicoVeiculo;
+import com.hrsoftware.business.StatusDoServico;
+import com.hrsoftware.business.dao.ServicoVeiculoDAO;
+import com.hrsoftware.business.view.ServicoVeiculoController;
+import com.hrsoftware.components.LoadingDialog;
+import com.hrsoftware.components.TableFactory;
+import com.hrsoftware.components.alerts.AlertDialog;
+import com.hrsoftware.components.notifications.Notificacoes;
+import com.hrsoftware.comum.AppManager;
+import com.hrsoftware.comum.ConsumerList;
+import com.hrsoftware.utilitario.Ferramentas;
+
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.util.Callback;
+
+public class InicioController implements Initializable {
+
+	@FXML
+	private AnchorPane ancPanInicio;
+
+	@FXML
+	private TableView<ServicoVeiculoDTO> tabelaCadastrados;
+
+	@FXML
+	private Button btnFinalizar;
+
+	@FXML
+	private Button btnEditar;
+
+	@FXML
+	private Button btnCancelar;
+
+	@FXML
+	public Button btnNovo;
+
+	private List<ServicoVeiculoDTO> servicoVeiculoDTOs;
+
+	private TableFactory<ServicoVeiculoDTO> tableFactory = new TableFactory<>();
+
+	private ServicoVeiculoDAO servicoVeiculoDAO = new ServicoVeiculoDAO();
+
+	private LoadingDialog loadingDialog = new LoadingDialog();
+
+	private ServicoVeiculoDTO servicoVeiculoDTO = null;
+
+	private ServicoVeiculo servicoVeiculo = null;
+
+	private Integer index = null;
+
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+
+		desabilitaBotoes(true);
+
+		loadingDialog.start(() -> {
+
+			// preencheTabela();
+			verificaCaixaAberto();
+
+		});
+
+	}
+
+	/*
+	 * private void toast() {
+	 * 
+	 * String toastMsg = "some text..."; int toastMsgTime = 3500; //3.5 seconds int
+	 * fadeInTime = 500; //0.5 seconds int fadeOutTime= 500; //0.5 seconds
+	 * Toast.makeText(GerenciadorStage.getInstance().getStage(), toastMsg,
+	 * toastMsgTime, fadeInTime, fadeOutTime);
+	 * 
+	 * }
+	 */
+
+	private void verificaCaixaAberto() {
+
+		if (Ferramentas.getCaixaAberto() == null) {
+
+			btnNovo.setDisable(true);
+			preencheObjeto();
+
+		} else {
+
+			btnNovo.setDisable(false);
+			preencheObjeto();
+		}
+	}
+
+	private void desabilitaBotoes(boolean desabilita) {
+
+		btnCancelar.setDisable(desabilita);
+		btnFinalizar.setDisable(desabilita);
+		btnEditar.setDisable(desabilita);
+	}
+
+	private void preencheObjeto() {
+
+		servicoVeiculoDTOs = new ArrayList<>();
+
+		List<ServicoVeiculo> servicoVeiculos = new ArrayList<>();
+		servicoVeiculos = servicoVeiculoDAO.selecionaAbertos(AppManager.getInstance().getUsuario().getBusinessClient());
+
+		servicoVeiculos.forEach(sv -> {
+
+			ServicoVeiculoDTO servicoDTO = new ServicoVeiculoDTO(sv);
+			servicoVeiculoDTOs.add(servicoDTO);
+
+		});
+
+		preencheTabela();
+
+	}
+
+	private void preencheTabela() {
+
+		Platform.runLater(() -> {
+
+			tableFactory.createTable(servicoVeiculoDTOs, tabelaCadastrados, ServicoVeiculoDTO.class,
+					Comparator.comparing(ServicoVeiculoDTO::getDataHoraCriacao).reversed());
+
+			configuraColunasTabela();
+
+		});
+
+	}
+
+	/**
+	 * CONFIGS
+	 */
+	private void configuraColunasTabela() {
+		tabelaCadastrados.getColumns().get(0).setPrefWidth(130);
+		tabelaCadastrados.getColumns().get(0).setStyle("-fx-alignment: CENTER");
+		tabelaCadastrados.getColumns().get(1).setStyle("-fx-alignment: CENTER");
+		tabelaCadastrados.getColumns().get(2).setPrefWidth(268);
+		tabelaCadastrados.getColumns().get(3).setPrefWidth(200);
+		tabelaCadastrados.getColumns().get(4).setPrefWidth(100);
+		tabelaCadastrados.getColumns().get(4).setStyle("-fx-alignment: CENTER-RIGHT");
+	}
+
+	@FXML
+	void acaoTabelaClicada(MouseEvent event) {
+
+		servicoVeiculoDTO = tabelaCadastrados.getSelectionModel().getSelectedItem();
+
+		if (servicoVeiculoDTO == null) {
+			desabilitaBotoes(true);
+			return;
+		}
+
+		loadingDialog.start(() -> {
+			carregaInformacoesTabela();
+		});
+
+	}
+
+	private void carregaInformacoesTabela() {
+
+		servicoVeiculo = servicoVeiculoDAO.getBy(servicoVeiculoDTO.getId());
+
+		index = tabelaCadastrados.getSelectionModel().getFocusedIndex();
+
+		Platform.runLater(() -> {
+			desabilitaBotoes(servicoVeiculoDTO == null);
+			tabelaCadastrados.requestFocus();
+		});
+
+	}
+
+	@FXML
+	void acaoBotaoChamaIntegrada(ActionEvent event) {
+	}
+
+	@FXML
+	void acaoBotaoNotificacao(ActionEvent event) {
+
+	}
+
+	@FXML
+	void acaoBotaoTeste(ActionEvent event) {
+
+	}
+
+	@FXML
+	void acaoBotaoNovo(ActionEvent event) {
+
+		ConsumerList<ServicoVeiculo> consumer = con -> {
+
+			con.forEach(sv -> {
+
+				ServicoVeiculoDTO servicoVeiculoDTO = new ServicoVeiculoDTO(sv);
+
+				Platform.runLater(() -> {
+					tableFactory.adicionaItem(servicoVeiculoDTO);
+				});
+
+			});
+
+		};
+
+		Callback<Class<?>, Object> controllerFactory = control -> {
+
+			if (control.equals(ServicoVeiculoController.class)) {
+				return new ServicoVeiculoController(consumer);
+			} else {
+
+				try {
+					return control.newInstance();
+				} catch (InstantiationException e) {
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+			}
+
+			return control;
+		};
+
+		limpaTabela();
+
+		GerenciadorStage.getInstance().configureViewController("business/view/ServicoVeiculo.fxml", controllerFactory);
+
+		GerenciadorStage.getInstance().showPopupUndecoratedController("Serviços");
+
+		servicoVeiculo = null;
+
+	}
+
+	private void limpaTabela() {
+
+		tabelaCadastrados.getSelectionModel().clearSelection();
+		tabelaCadastrados.refresh();
+
+		desabilitaBotoes(true);
+	}
+
+	@FXML
+	void acaoBotaoFinalizar(ActionEvent event) {
+
+		if (servicoVeiculo == null)
+			return;
+
+		if (!AlertDialog.exibe(AlertType.CONFIRMATION, "Finalizar Serviço",
+				"Tem certeza que quer finalizar o serviço ?"))
+			return;
+
+		servicoVeiculo.setStatusDoServico(StatusDoServico.TERMINADO);
+
+		loadingDialog.start(() -> {
+			finalizaServico();
+		});
+
+	}
+
+	private void finalizaServico() {
+
+		if (servicoVeiculoDAO.atualizaObjeto(servicoVeiculo) != null) {
+
+			Notificacoes.getInstance().mostraCurta(null, "Serviço finalizado com sucesso");
+
+			Platform.runLater(() -> {
+				tableFactory.removeitem(index);
+			});
+
+			servicoVeiculo = null;
+
+			limpaInicio(true);
+
+		} else {
+
+			Notificacoes.getInstance().mostraCurta(null, "Finalizar",
+					"O serviço não pode ser finalizado, por favor \n tente mais tarde.");
+
+		}
+
+	}
+
+	@FXML
+	void acaoBotaoEditar(ActionEvent event) {
+
+		Callback<Class<?>, Object> controllerFactory = control -> {
+
+			if (control.equals(ServicoVeiculoController.class)) {
+				ServicoVeiculoController servicoVeiculoController = new ServicoVeiculoController(servicoVeiculo);
+				return servicoVeiculoController;
+			} else {
+				try {
+					return control.newInstance();
+				} catch (InstantiationException e) {
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+			}
+
+			return control;
+		};
+
+		GerenciadorStage.getInstance().configureViewController("business/view/ServicoVeiculo.fxml", controllerFactory);
+
+		GerenciadorStage.getInstance().showPopupUndecoratedController("Serviços");
+
+		servicoVeiculo = null;
+
+		tabelaCadastrados.refresh();
+
+	}
+
+	@FXML
+	void acaoBotaoCancelar(ActionEvent event) {
+
+		if (servicoVeiculo == null)
+			return;
+
+		if (!AlertDialog.exibe(AlertType.CONFIRMATION, "Excluir", "Tem certeza que deseja excluir ?")) {
+			return;
+		}
+
+		loadingDialog.start(() -> {
+			cancela();
+		});
+
+	}
+
+	private void cancela() {
+
+		if (servicoVeiculoDAO.remove(servicoVeiculo.getId())) {
+
+			Notificacoes.getInstance().mostraCurta(null, "Registro cancelado com sucesso");
+
+			Platform.runLater(() -> {
+				tableFactory.removeitem(index);
+			});
+
+			servicoVeiculo = null;
+
+		} else {
+
+			Notificacoes.getInstance().mostraCurta(null, "Não foi cancelar o registro, por favor tente mais tarde.");
+
+		}
+
+	}
+
+	public void limpaInicio(boolean limpa) {
+
+		Platform.runLater(() -> {
+			btnCancelar.setDisable(limpa);
+			btnFinalizar.setDisable(limpa);
+			btnEditar.setDisable(limpa);
+
+			tabelaCadastrados.getSelectionModel().clearSelection();
+
+			servicoVeiculo = new ServicoVeiculo();
+		});
+	}
+}
