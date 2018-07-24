@@ -1,4 +1,4 @@
-package com.hrsoftware.services.http;
+package com.hrsoftware.services;
 
 public enum MethodHTTP {
 
