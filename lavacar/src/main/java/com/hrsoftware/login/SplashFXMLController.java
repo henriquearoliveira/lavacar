@@ -21,7 +21,7 @@ public class SplashFXMLController implements Initializable {
 	public void initialize(URL url, ResourceBundle rb) {
 
 		// FECHA A JANELA DO LOGIN
-		GerenciadorStage.getInstance().getStage().hide();
+		GerenciadorStage.getInstance().getStage().close();
 
 		rootPane.setOpacity(0);
 		fazFadeIn();

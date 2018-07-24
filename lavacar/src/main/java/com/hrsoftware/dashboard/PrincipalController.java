@@ -110,44 +110,6 @@ public class PrincipalController implements Initializable {
 
 	}
 
-	/*
-	 * @FXML public void acaoBotaoNotificacao(ActionEvent event) throws IOException
-	 * {
-	 *
-	 * Notifications notifications =
-	 * Notifications.create().title("Log Success").text("Logado com Sucesso")
-	 * .hideAfter(Duration.seconds(3)).position(Pos.BOTTOM_RIGHT);
-	 *
-	 * notifications.showConfirm();
-	 *
-	 * Notifications notification =
-	 * Notifications.create().title("Log Success").text("Logado com Sucesso")
-	 * .hideAfter(Duration.seconds(3)).position(Pos.BOTTOM_RIGHT);
-	 *
-	 * notification.showConfirm();
-	 *
-	 * NotificationPane notificationPane = new NotificationPane();
-	 * notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
-	 * notificationPane.show();
-	 *
-	 * WebView webView = new WebView();
-	 *
-	 * // Wrap it inside a NotificationPane NotificationPane notificationPane = new
-	 * NotificationPane(webView);
-	 *
-	 * // and put the NotificationPane inside a Tab Tab tab1 = new Tab("Tab 1");
-	 * tab1.setContent(notificationPane);
-	 *
-	 * // and the Tab inside a TabPane. We just have one tab here, but of course //
-	 * // you can have more! TabPane tabPane = new TabPane();
-	 * tabPane.getTabs().addAll(tab1);
-	 *
-	 * notificationPane.setText("Do you want to save your password?");
-	 * notificationPane.show();
-	 *
-	 * }
-	 */
-
 	@FXML
 	void acaoFechamentoCaixa(MouseEvent event) {
 

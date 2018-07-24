@@ -243,7 +243,7 @@ public class ClienteController extends ViewAbstract<Cliente> implements Initiali
 
 	@FXML
 	public void onClose(ActionEvent event) {
-		GerenciadorStage.getInstance().getStage().hide();
+		GerenciadorStage.getInstance().getStage().close();
 	}
 
 	@FXML

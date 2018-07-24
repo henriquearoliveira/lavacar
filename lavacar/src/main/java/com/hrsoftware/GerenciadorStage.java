@@ -15,6 +15,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -71,16 +72,17 @@ public class GerenciadorStage<T> {
 
 	public void showPopupUndecorated(String caminho, String titulo) {
 
-		Node node = null;
+		AnchorPane node = null;
+		Scene scene = null;
 		try {
 			node = FXMLLoader.load(getClass().getResource(caminho));
+			scene = new Scene(FXMLLoader.load(getClass().getResource(caminho)));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		Scene scene = new Scene((Parent) node);
-
+		
 		stage.setScene(scene);
+		stage.setWidth(scene.getWidth());
 
 		if (titulo != null)
 			stage.setTitle(titulo);
@@ -89,7 +91,7 @@ public class GerenciadorStage<T> {
 			stage.initStyle(StageStyle.UNDECORATED);
 
 		adminated(node);
-		stage.showAndWait();
+		stage.show();
 
 	}
 

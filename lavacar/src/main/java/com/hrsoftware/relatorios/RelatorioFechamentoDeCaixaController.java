@@ -131,7 +131,7 @@ public class RelatorioFechamentoDeCaixaController extends ViewAbstract<FluxoDeCa
 
 	@FXML
 	void onClose(ActionEvent event) {
-		GerenciadorStage.getInstance().getStage().hide();
+		GerenciadorStage.getInstance().getStage().close();
 	}
 
 	@FXML
