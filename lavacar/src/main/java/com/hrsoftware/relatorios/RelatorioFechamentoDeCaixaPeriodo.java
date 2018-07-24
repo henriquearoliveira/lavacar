@@ -9,6 +9,7 @@ import com.hrsoftware.components.LoadingDialog;
 import com.hrsoftware.components.alerts.AlertDialog;
 import com.hrsoftware.components.dialogs.DateInterval;
 import com.hrsoftware.components.dialogs.DialogDateInterval;
+import com.hrsoftware.services.UrlConnect;
 import com.hrsoftware.utilitario.Ferramentas;
 
 import javafx.fxml.FXML;
@@ -56,9 +57,27 @@ public class RelatorioFechamentoDeCaixaPeriodo {
 		params.put("dataInicio", Ferramentas.localDateToDate(dateInterval.getInicio()));
 		params.put("dataTermino", Ferramentas.localDateToDate(dateInterval.getTermino()));
 
-		Relatorio relatorio = new RelatorioBuilder().criaRelatorio(params, RelatoriosCaminho.FECHAMENTO_CAIXA_PERIODO)
+		Database database = new Database();
+		database.setPassword("");
+		database.setUrlConnection("");
+		database.setUsername("");
+
+		FTP ftp = new FTP();
+		ftp.setHostFTP("");
+		ftp.setPassword("");
+		ftp.setPathReports(PathReports.FECHAMENTO_CAIXA_PERIODO);
+		ftp.setPort(21);
+		ftp.setUsername("");
+
+		Report report = new Report();
+		report.setDatabase(database);
+		report.setFtp(ftp);
+		report.setParams(params);
+		report.setTypeFormat(TypeFormat.PDF);
+
+		Relatorio relatorio = new RelatorioBuilder().criaRelatorio(UrlConnect.RELATORIO_FECHAMENTO_CAIXA, report)
 				.build();
-		relatorio.exibeRelatorio();
+		relatorio.exportPDF();
 
 	}
 

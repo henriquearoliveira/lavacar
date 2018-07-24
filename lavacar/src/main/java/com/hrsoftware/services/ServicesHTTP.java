@@ -9,6 +9,8 @@ public class ServicesHTTP<T> {
 	private T object;
 	private List<T> list;
 
+	private String fileName;
+
 	public T getObject() {
 		return object;
 	}
@@ -39,6 +41,14 @@ public class ServicesHTTP<T> {
 
 	public void setResponseCode(int responseCode) {
 		this.responseCode = responseCode;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 
 }

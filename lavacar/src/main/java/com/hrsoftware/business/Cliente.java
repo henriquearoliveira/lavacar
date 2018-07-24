@@ -11,13 +11,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.hrsoftware.components.Tabela;
 import com.hrsoftware.comum.BeanIdentificavel;
 
 @Entity
 @Table(name = "cliente", indexes = { @Index(name = "nome", columnList = "nome", unique = false) })
-@JsonIgnoreProperties(ignoreUnknown = true) // ANOTAÇÃO DO JACKSON PRA IGNORAR OS CAMPOS QUE NÃO TENHO
+//@JsonIgnoreProperties(ignoreUnknown = true) // ANOTAÇÃO DO JACKSON PRA IGNORAR OS CAMPOS QUE NÃO TENHO
 public class Cliente extends BeanIdentificavel {
 
 	@ManyToOne

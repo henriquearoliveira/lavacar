@@ -19,7 +19,15 @@ public abstract class FTPAbstract implements FTPConnection {
 	public static final String password = "passwordFTP";
 
 	public static String getPathDownloads() {
-		return System.getProperty("java.io.tmpdir") + "/relatorio/";
+
+		String path = System.getProperty("java.io.tmpdir") + "/relatorio/";
+
+		File diretorioLocal = new File(path);
+
+		if (!diretorioLocal.exists())
+			diretorioLocal.mkdirs();
+
+		return path;
 	}
 
 	@SuppressWarnings("finally")
@@ -39,12 +47,7 @@ public abstract class FTPAbstract implements FTPConnection {
 			String remoteFile = "/lavacar-relatorios/" + arquivo;
 
 			String caminhoLocal = Ferramentas.getCaminhoLocal(arquivo);
-			
-			File diretorioLocal = new File(getPathDownloads());
-			
-			if (!diretorioLocal.exists())
-				diretorioLocal.mkdirs();
-			
+
 			File downloadFile = new File(getPathDownloads() + caminhoLocal);
 
 			OutputStream outputStream1 = new BufferedOutputStream(new FileOutputStream(downloadFile));

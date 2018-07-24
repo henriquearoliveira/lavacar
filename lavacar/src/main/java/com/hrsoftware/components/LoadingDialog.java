@@ -39,6 +39,9 @@ public class LoadingDialog {
 		task.setOnFailed(event -> {
 
 			pForm.getDialogStage().close();
+			System.out.println(event.getSource().getException());
+			System.out.println(event.getSource().getTitle());
+			System.out.println(event.getSource().getMessage());
 
 		});
 

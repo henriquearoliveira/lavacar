@@ -133,8 +133,7 @@ public class ClienteController extends ViewAbstract<Cliente> implements Initiali
 			return;
 		}
 
-		System.out.println("AQUI");
-		ServicosRest<Cliente> services = new ServicosRest<Cliente>(UrlConnect.BAIRRO, null, cep);
+		ServicosRest<Cliente> services = new ServicosRest<Cliente>(UrlConnect.BAIRRO, null, new String[]{cep});
 
 		services.doRequest(shttp -> {
 			preencheCamposCEP(shttp.getObject());

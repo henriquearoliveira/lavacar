@@ -14,6 +14,7 @@ import com.hrsoftware.business.view.ViewAbstract;
 import com.hrsoftware.components.LoadingDialog;
 import com.hrsoftware.components.TableFactory;
 import com.hrsoftware.comum.AppManager;
+import com.hrsoftware.services.UrlConnect;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -88,8 +89,27 @@ public class RelatorioController extends ViewAbstract<FluxoDeCaixa> implements I
         Map<String, Object> params = new HashMap<>();
         params.put("idFluxoDeCaixa", fluxoDeCaixa.getId());
 
-        Relatorio relatorio = new RelatorioBuilder().criaRelatorio(params, RelatoriosCaminho.FECHAMENTO_CAIXA).build();
-        relatorio.exibeRelatorio();
+        Database database = new Database();
+		database.setPassword("");
+		database.setUrlConnection("");
+		database.setUsername("");
+
+		FTP ftp = new FTP();
+		ftp.setHostFTP("");
+		ftp.setPassword("");
+		ftp.setPathReports(PathReports.FECHAMENTO_CAIXA);
+		ftp.setPort(21);
+		ftp.setUsername("");
+
+		Report report = new Report();
+		report.setDatabase(database);
+		report.setFtp(ftp);
+		report.setParams(params);
+		report.setTypeFormat(TypeFormat.PDF);
+
+		Relatorio relatorio = new RelatorioBuilder().criaRelatorio(UrlConnect.RELATORIO_FECHAMENTO_CAIXA, report)
+				.build();
+		relatorio.exportPDF();
 
     }
 

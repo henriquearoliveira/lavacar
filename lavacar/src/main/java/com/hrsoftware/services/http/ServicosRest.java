@@ -2,6 +2,7 @@ package com.hrsoftware.services.http;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
@@ -9,6 +10,9 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -16,11 +20,16 @@ import java.util.function.Consumer;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.hrsoftware.components.LoadingDialog;
+import com.hrsoftware.components.notifications.Notificacoes;
+import com.hrsoftware.ftp.FTPAbstract;
+import com.hrsoftware.relatorios.RelatorioBuilder;
 import com.hrsoftware.services.GsonMapper;
 import com.hrsoftware.services.MethodHTTP;
 import com.hrsoftware.services.ServicesHTTP;
 import com.hrsoftware.services.TypeResponse;
 import com.hrsoftware.services.UrlConnect;
+
+import javafx.application.Platform;
 
 public class ServicosRest<T> {
 
@@ -28,10 +37,10 @@ public class ServicosRest<T> {
 	private T body;
 	private String[] params;
 
-	public ServicosRest(UrlConnect urlConnect, T body, String... paramns) {
+	public ServicosRest(UrlConnect urlConnect, T body, String[] params) {
 		this.urlConnect = urlConnect;
 		this.body = body;
-		this.params = paramns;
+		this.params = params;
 	}
 
 	public void doRequest(Consumer<ServicesHTTP<T>> consumer) {
@@ -42,13 +51,14 @@ public class ServicosRest<T> {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	private void doHttpRequest(Consumer<ServicesHTTP<T>> consumer) {
+		
+		limpaRelatoriosExistentes();
 
 		URL url = null;
 		ServicesHTTP<T> servicesHTTP = new ServicesHTTP<>();
 
-		String urlWithParams = trataParametros();
+		String urlWithParams = params == null ? urlConnect.getUrl() : trataParametros();
 
 		try {
 			url = new URL(urlWithParams);
@@ -64,27 +74,65 @@ public class ServicosRest<T> {
 			con.setRequestMethod(urlConnect.getMethodHTTP().getDescricao());
 			con.setRequestProperty("Content-Type", "application/json");
 
+			con.setConnectTimeout(5000);
+			con.setReadTimeout(5000);
+
 			if (urlConnect.getMethodHTTP().equals(MethodHTTP.POST)
 					|| urlConnect.getMethodHTTP().equals(MethodHTTP.PUT)) {
+				System.out.println("entrou");
 				configuraPost(con);
 			}
 
 			servicesHTTP.setResponseCode(con.getResponseCode());
 			servicesHTTP.setResponseMessage(con.getResponseMessage());
 
-			con.setConnectTimeout(5000);
-			con.setReadTimeout(5000);
+			System.out.println("WHAT");
+			if (trataResponseCode(con.getResponseCode()))
+				return;
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		Gson gson = new GsonMapper().createGson();
+		if (urlConnect.getTypeResponseGet().equals(TypeResponse.BYTE)) {
 
-		T objeto = null;
-		List<T> list = null;
+			configuraFile(consumer, servicesHTTP, con);
+			consumer.accept(servicesHTTP);
+			
+			return;
+
+		}
+
+		configuraGet(servicesHTTP, con);
+
+		consumer.accept(servicesHTTP);
+	}
+
+	private void configuraFile(Consumer<ServicesHTTP<T>> consumer, ServicesHTTP<T> servicesHTTP,
+			HttpURLConnection con) {
+		
+		String contentDisposition = con.getHeaderField("Content-Disposition");
+		String reportName = contentDisposition.substring(contentDisposition.indexOf("=") + 1,
+				con.getHeaderField("Content-Disposition").length());
+
+		try (InputStream inputStream = con.getInputStream()) {
+
+			Files.copy(inputStream, Paths.get(FTPAbstract.getPathDownloads() + reportName),
+					StandardCopyOption.REPLACE_EXISTING);
+			
+			servicesHTTP.setFileName(reportName);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	private void configuraGet(ServicesHTTP<T> servicesHTTP, HttpURLConnection con) {
 
 		Reader reader = null;
+
 		try {
 			reader = new InputStreamReader(con.getInputStream(), "UTF-8");
 		} catch (UnsupportedEncodingException e) {
@@ -93,17 +141,59 @@ public class ServicosRest<T> {
 			e.printStackTrace();
 		}
 
-		if (urlConnect.getTypeResponse().equals(TypeResponse.OBJECT)) {
+		Gson gson = new GsonMapper().createGson();
+		T objeto = null;
+		List<T> list = null;
+
+		if (urlConnect.getTypeResponseGet().equals(TypeResponse.OBJECT)) {
+			System.out.println("oxi");
 			objeto = gson.fromJson(reader, (Class<T>) urlConnect.getClasse());
 			servicesHTTP.setObject(objeto);
-		} else {
+		} else if (urlConnect.getTypeResponseGet().equals(TypeResponse.LIST)) {
 			Type type = new TypeToken<ArrayList<T>>() {
 			}.getType();
 			list = gson.fromJson(reader, type);
 			servicesHTTP.setList(list);
 		}
 
-		consumer.accept(servicesHTTP);
+	}
+
+	private void configuraPost(HttpURLConnection con) {
+
+		con.setDoOutput(true);
+		Gson gson = new GsonMapper().createGson();
+
+		String json = null;
+
+		if (urlConnect.getTypeResponsePost().equals(TypeResponse.OBJECT)) {
+			Type type = new TypeToken<T>() {
+			}.getType();
+			json = gson.toJson(body, type);
+		} else if (urlConnect.getTypeResponsePost().equals(TypeResponse.LIST)) {
+			Type type = new TypeToken<ArrayList<T>>() {
+			}.getType();
+			json = gson.toJson(body, type);
+		}
+
+		try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
+			wr.write(json.getBytes());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private boolean trataResponseCode(int responseCode) {
+
+		if (responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR) {
+			Platform.runLater(() -> {
+				Notificacoes.getInstance().mostraCurta(null, "Erro no servidor, por favor tente mais tarde.");
+			});
+			return true;
+		}
+
+		return false;
+
 	}
 
 	private String trataParametros() {
@@ -116,19 +206,13 @@ public class ServicosRest<T> {
 
 		return url;
 	}
-
-	private void configuraPost(HttpURLConnection con) {
-
-		con.setDoOutput(true);
-		Gson gson = new GsonMapper().createGson();
-		String json = gson.toJson(body);
-
-		try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
-			wr.writeUTF(json);
+	
+	private void limpaRelatoriosExistentes() {
+		try {
+			RelatorioBuilder.deletaRelatoriosTemp();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 }

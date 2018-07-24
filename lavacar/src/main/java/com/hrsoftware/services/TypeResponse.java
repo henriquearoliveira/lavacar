@@ -2,6 +2,6 @@ package com.hrsoftware.services;
 
 public enum TypeResponse {
 	
-	OBJECT, LIST;
+	OBJECT, LIST, BYTE
 
 }
