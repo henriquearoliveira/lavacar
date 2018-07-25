@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import com.hrsoftware.GerenciadorStage;
 import com.hrsoftware.business.Cliente;
 import com.hrsoftware.business.dao.ClienteDAO;
 import com.hrsoftware.components.LoadingDialog;
@@ -22,7 +21,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -30,7 +28,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
-public class ClienteController extends ViewAbstract<Cliente> implements Initializable {
+public class ClienteController extends ViewAbstract<Cliente> {
 
 	@FXML
 	private JFXTextField txtNome;
@@ -133,7 +131,7 @@ public class ClienteController extends ViewAbstract<Cliente> implements Initiali
 			return;
 		}
 
-		ServicosRest<Cliente> services = new ServicosRest<Cliente>(UrlConnect.BAIRRO, null, new String[]{cep});
+		ServicosRest<Cliente> services = new ServicosRest<Cliente>(UrlConnect.BAIRRO, null, new String[] { cep });
 
 		services.doRequest(shttp -> {
 			preencheCamposCEP(shttp.getObject());
@@ -239,11 +237,6 @@ public class ClienteController extends ViewAbstract<Cliente> implements Initiali
 		tableCadastrados.getColumns().get(2).setStyle("-fx-alignment: CENTER");
 		tableCadastrados.getColumns().get(2).setPrefWidth(113);
 
-	}
-
-	@FXML
-	public void onClose(ActionEvent event) {
-		GerenciadorStage.getInstance().getStage().close();
 	}
 
 	@FXML

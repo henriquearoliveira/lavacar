@@ -3,6 +3,7 @@ package com.hrsoftware.business.view;
 import java.util.Comparator;
 import java.util.List;
 
+import com.hrsoftware.GerenciadorStage;
 import com.hrsoftware.business.dao.StatusException;
 import com.hrsoftware.components.TableFactory;
 import com.hrsoftware.components.notifications.Notificacoes;
@@ -10,10 +11,13 @@ import com.hrsoftware.comum.BeanIdentificavel;
 import com.hrsoftware.dao.DaoAbstrato;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
 
-public abstract class ViewAbstract<T extends BeanIdentificavel> implements ConfiguracoesView<T> {
+public abstract class ViewAbstract<T extends BeanIdentificavel> implements ConfiguracoesView<T>, Initializable {
 
 	private DaoAbstrato<T> dao;
 	private TableView<T> tableCadastrados;
@@ -149,6 +153,11 @@ public abstract class ViewAbstract<T extends BeanIdentificavel> implements Confi
 			return false;
 		}
 
+	}
+	
+	@FXML
+	public void onClose(ActionEvent event) {
+		GerenciadorStage.getInstance().getStage().close();
 	}
 
 }

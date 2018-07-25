@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import com.hrsoftware.GerenciadorStage;
 import com.hrsoftware.business.Cliente;
 import com.hrsoftware.business.Veiculo;
 import com.hrsoftware.business.dao.ClienteDAO;
@@ -21,7 +20,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -29,7 +27,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
-public class VeiculoController extends ViewAbstract<Veiculo> implements Initializable {
+public class VeiculoController extends ViewAbstract<Veiculo> {
 
 	@FXML
 	private JFXTextField txtNome;
@@ -137,11 +135,6 @@ public class VeiculoController extends ViewAbstract<Veiculo> implements Initiali
 		tableCadastrados.getColumns().get(2).setPrefWidth(118);
 		tableCadastrados.getColumns().get(2).setStyle("-fx-alignment: CENTER");
 
-	}
-
-	@FXML
-	public void onClose(ActionEvent event) {
-		GerenciadorStage.getInstance().getStage().hide();
 	}
 
 	@FXML

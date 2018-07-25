@@ -183,7 +183,7 @@ public class FecharCaixaController implements Initializable {
 	@FXML
 	public void onClose(ActionEvent event) {
 		Platform.runLater(() -> {
-			GerenciadorStage.getInstance().getStage().hide();
+			GerenciadorStage.getInstance().getStage().close();
 		});
 	}
 

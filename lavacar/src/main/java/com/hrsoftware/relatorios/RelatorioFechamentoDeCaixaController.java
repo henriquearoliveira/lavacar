@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import com.hrsoftware.GerenciadorStage;
 import com.hrsoftware.business.FluxoDeCaixa;
 import com.hrsoftware.business.dao.FluxoDeCaixaDAO;
 import com.hrsoftware.business.view.ViewAbstract;
@@ -18,14 +17,13 @@ import com.hrsoftware.services.UrlConnect;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
-public class RelatorioFechamentoDeCaixaController extends ViewAbstract<FluxoDeCaixa> implements Initializable {
+public class RelatorioFechamentoDeCaixaController extends ViewAbstract<FluxoDeCaixa> {
 
 	@FXML
 	private Button btnImprimir;
@@ -127,11 +125,6 @@ public class RelatorioFechamentoDeCaixaController extends ViewAbstract<FluxoDeCa
 			btnImprimir.setDisable(true);
 		}
 
-	}
-
-	@FXML
-	void onClose(ActionEvent event) {
-		GerenciadorStage.getInstance().getStage().close();
 	}
 
 	@FXML

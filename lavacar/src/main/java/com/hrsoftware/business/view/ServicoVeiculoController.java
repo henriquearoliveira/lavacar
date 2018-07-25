@@ -7,7 +7,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import com.hrsoftware.GerenciadorStage;
 import com.hrsoftware.business.BusinessClient;
 import com.hrsoftware.business.Cliente;
 import com.hrsoftware.business.FluxoDeCaixa;
@@ -31,7 +30,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -39,7 +37,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
-public class ServicoVeiculoController extends ViewAbstract<ServicoVeiculo> implements Initializable {
+public class ServicoVeiculoController extends ViewAbstract<ServicoVeiculo> {
 
 	@FXML
 	private Button btnGravar;
@@ -233,11 +231,6 @@ public class ServicoVeiculoController extends ViewAbstract<ServicoVeiculo> imple
 	@Deprecated
 	public void configuraColunasTabela() {
 
-	}
-
-	@FXML
-	public void onClose(ActionEvent event) {
-		GerenciadorStage.getInstance().getStage().hide();
 	}
 
 	@FXML

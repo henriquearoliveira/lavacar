@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import com.hrsoftware.GerenciadorStage;
 import com.hrsoftware.business.Servico;
 import com.hrsoftware.business.dao.ServicoDAO;
 import com.hrsoftware.components.LoadingDialog;
@@ -20,7 +19,6 @@ import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -28,7 +26,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
-public class ServicoController extends ViewAbstract<Servico> implements Initializable {
+public class ServicoController extends ViewAbstract<Servico> {
 
 	@FXML
 	private JFXTextField txtDescricao;
@@ -117,11 +115,6 @@ public class ServicoController extends ViewAbstract<Servico> implements Initiali
 		tableCadastrados.getColumns().get(1).setPrefWidth(350);
 		tableCadastrados.getColumns().get(2).setPrefWidth(118);
 
-	}
-
-	@FXML
-	public void onClose(ActionEvent event) {
-		GerenciadorStage.getInstance().getStage().hide();
 	}
 
 	@FXML

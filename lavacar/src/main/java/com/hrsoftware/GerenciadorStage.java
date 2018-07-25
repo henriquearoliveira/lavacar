@@ -11,12 +11,13 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
@@ -25,6 +26,8 @@ import javafx.util.Duration;
 public class GerenciadorStage<T> {
 
 	private StackPane rootLayout;
+
+	private Stage primaryStage;
 
 	private Map<TipoController, T> controller = new HashMap<>();
 
@@ -72,17 +75,27 @@ public class GerenciadorStage<T> {
 
 	public void showPopupUndecorated(String caminho, String titulo) {
 
-		AnchorPane node = null;
-		Scene scene = null;
+		Node node = null;
 		try {
 			node = FXMLLoader.load(getClass().getResource(caminho));
-			scene = new Scene(FXMLLoader.load(getClass().getResource(caminho)));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
+		Scene scene = new Scene((Parent) node);
+
 		stage.setScene(scene);
 		stage.setWidth(scene.getWidth());
+		stage.setMaxWidth(scene.getWidth());
+		stage.setMinWidth(scene.getWidth());
+		
+		stage.centerOnScreen();
+
+		if (stage.isShowing()) {
+			Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+			stage.setX((screenBounds.getWidth() - stage.getWidth()) / 2);
+			stage.setY((screenBounds.getHeight() - stage.getHeight()) / 2);
+		}
 
 		if (titulo != null)
 			stage.setTitle(titulo);
@@ -201,18 +214,18 @@ public class GerenciadorStage<T> {
 
 		Scene scene = new Scene(root);
 
-		Stage stage = new Stage();
-		stage.setScene(scene);
+		primaryStage = new Stage();
+		primaryStage.setScene(scene);
 		// stage.setMaximized(true);
-		stage.setTitle("Lava Rápido");
-		stage.setMinHeight(680);
-		stage.setMinWidth(1100);
-		stage.getIcons().add(new Image(getClass().getResource("login/images/lava-rapido.png").toString()));
-		stage.setOnCloseRequest(req -> {
+		primaryStage.setTitle("Lava Rápido");
+		primaryStage.setMinHeight(680);
+		primaryStage.setMinWidth(1100);
+		primaryStage.getIcons().add(new Image(getClass().getResource("login/images/lava-rapido.png").toString()));
+		primaryStage.setOnCloseRequest(req -> {
 			Platform.exit();
 			System.exit(0);
 		});
-		stage.show();
+		primaryStage.show();
 
 	}
 
