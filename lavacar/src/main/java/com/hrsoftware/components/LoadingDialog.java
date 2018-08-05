@@ -1,7 +1,9 @@
 package com.hrsoftware.components;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -16,9 +18,27 @@ public class LoadingDialog {
 	private ProgressForm pForm = new ProgressForm();
 
 	public void start(TaskManager taskManager) {
+		
+		pForm.activateProgressBar(null);
+		
+		CompletableFuture.runAsync(() -> {
+			taskManager.doIt();
+		}).exceptionally(ex -> {
+			
+			System.out.println(ex.getMessage());
+			System.out.println(ex.getStackTrace());
+			return null;
+			
+		}).thenAccept(sti -> {
+			
+			Platform.runLater(() -> {
+				pForm.getDialogStage().close();
+			});
+		
+		});
 
 		// PROGRESS
-		Task<Void> task = new Task<Void>() {
+		/*Task<Void> task = new Task<Void>() {
 
 			@Override
 			public Void call() throws InterruptedException {
@@ -43,12 +63,12 @@ public class LoadingDialog {
 			System.out.println(event.getSource().getTitle());
 			System.out.println(event.getSource().getMessage());
 
-		});
+		});*/
 
-		pForm.getDialogStage().show();
+		/*pForm.getDialogStage().show();
 
 		Thread thread = new Thread(task);
-		thread.start();
+		thread.start();*/
 
 	}
 
