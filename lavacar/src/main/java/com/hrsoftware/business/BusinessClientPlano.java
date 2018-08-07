@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Index;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -17,11 +16,9 @@ import com.hrsoftware.comum.BeanIdentificavel;
 public class BusinessClientPlano extends BeanIdentificavel {
 
 	@ManyToOne
-	@JoinColumn(name = "businessClient_id", nullable = false)
 	private BusinessClient businessClient;
 
 	@ManyToOne
-	@JoinColumn(name = "plano_id", nullable = false)
 	private Plano plano;
 
 	@Column(nullable = false)

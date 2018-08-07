@@ -3,9 +3,9 @@ package com.hrsoftware.business;
 import java.math.BigDecimal;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -25,7 +25,7 @@ public class Plano extends BeanIdentificavel {
 	@Column(nullable = false)
 	private TipoDePlano tipoDePlano;
 
-	@OneToMany(mappedBy = "plano", targetEntity = BusinessClientPlano.class,fetch = FetchType.LAZY) //cascade = CascadeType.ALL
+	@OneToMany(mappedBy = "plano", targetEntity = BusinessClientPlano.class, cascade = CascadeType.PERSIST)
 	private List<BusinessClientPlano> BusinessClientPlanos;
 
 	public String getNome() {

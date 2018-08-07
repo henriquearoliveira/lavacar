@@ -2,9 +2,9 @@ package com.hrsoftware.business;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -31,19 +31,19 @@ public class BusinessClient extends BeanIdentificavel {
 
 	private String numero;
 
-	@OneToMany(mappedBy = "businessClient", targetEntity = BusinessClientPlano.class,fetch = FetchType.LAZY) //cascade = CascadeType.ALL
+	@OneToMany(mappedBy = "businessClient", targetEntity = BusinessClientPlano.class, cascade = CascadeType.PERSIST)
 	private List<BusinessClientPlano> businessClientPlanos;
 
-	@OneToMany(mappedBy = "businessClient", targetEntity = Usuario.class, fetch = FetchType.LAZY) //, cascade = CascadeType.ALL
+	@OneToMany(mappedBy = "businessClient", targetEntity = Usuario.class, cascade = CascadeType.PERSIST)
 	private List<Usuario> usuarios;
 
-	@OneToMany(mappedBy = "businessClient", targetEntity = Cliente.class, fetch = FetchType.LAZY) //, cascade = CascadeType.ALL
+	@OneToMany(mappedBy = "businessClient", targetEntity = Cliente.class, cascade = CascadeType.PERSIST)
 	private List<Cliente> clientes;
 
-	@OneToMany(mappedBy = "businessClient", targetEntity = FluxoDeCaixa.class, fetch = FetchType.LAZY) //cascade = CascadeType.ALL
+	@OneToMany(mappedBy = "businessClient", targetEntity = FluxoDeCaixa.class, cascade = CascadeType.PERSIST)
 	private List<FluxoDeCaixa> fluxoDeCaixa;
 	
-	@OneToMany(mappedBy = "businessClient", targetEntity = Servico.class, fetch = FetchType.LAZY) //cascade = CascadeType.ALL
+	@OneToMany(mappedBy = "businessClient", targetEntity = Servico.class, cascade = CascadeType.PERSIST)
 	private List<Servico> servicos;
 
 	public String getCNPJ() {

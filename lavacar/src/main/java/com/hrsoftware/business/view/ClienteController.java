@@ -202,16 +202,6 @@ public class ClienteController extends ViewAbstract<Cliente> {
 		Ferramentas.limitaCaracteres(txtTelefone, 11);
 
 		Ferramentas.limitaCaracteres(txtCep, 8);
-
-		/*
-		 * txtTelefone.textProperty().addListener((observable, oldValue, newValue) -> {
-		 * if (newValue != null) { if (newValue.length() > 11) {
-		 * txtTelefone.setText(oldValue); } } });
-		 * 
-		 * txtCep.textProperty().addListener((observable, oldValue, newValue) -> { if
-		 * (newValue != null) { if (newValue.length() > 8) {
-		 * txtTelefone.setText(oldValue); } } });
-		 */
 	}
 
 	/**

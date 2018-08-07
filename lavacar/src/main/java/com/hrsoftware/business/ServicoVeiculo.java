@@ -5,7 +5,6 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Index;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -17,15 +16,12 @@ import com.hrsoftware.comum.BeanIdentificavel;
 public class ServicoVeiculo extends BeanIdentificavel {
 	
 	@ManyToOne
-	@JoinColumn(name = "fluxoDeCaixa_id", nullable = false)
 	private FluxoDeCaixa fluxoDeCaixa;
 
 	@ManyToOne
-	@JoinColumn(name = "veiculo_id", nullable = false)
 	private Veiculo veiculo;
 
 	@ManyToOne
-	@JoinColumn(name = "servico_id", nullable = false)
 	private Servico servico;
 
 	@Column(nullable = false)

@@ -2,7 +2,13 @@ package com.hrsoftware.business;
 
 import java.math.BigDecimal;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Index;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import com.hrsoftware.components.Tabela;
 import com.hrsoftware.comum.BeanIdentificavel;
@@ -12,7 +18,6 @@ import com.hrsoftware.comum.BeanIdentificavel;
 public class Lancamento extends BeanIdentificavel {
 
 	@ManyToOne
-	@JoinColumn(name = "fluxoDeCaixa_id", nullable = false)
 	private FluxoDeCaixa fluxoDeCaixa;
 
 	@Tabela(name = "Descrição")

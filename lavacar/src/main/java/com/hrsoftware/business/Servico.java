@@ -3,11 +3,10 @@ package com.hrsoftware.business;
 import java.math.BigDecimal;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Index;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -21,7 +20,6 @@ import com.hrsoftware.comum.BeanIdentificavel;
 public class Servico extends BeanIdentificavel {
 
 	@ManyToOne
-	@JoinColumn(name = "businessClient_id", nullable = false)
 	private BusinessClient businessClient;
 
 	@Tabela(name = "Descrição")
@@ -36,8 +34,7 @@ public class Servico extends BeanIdentificavel {
 	@Column(nullable = true)
 	private String observação;
 
-	@OneToMany(mappedBy = "servico", targetEntity = ServicoVeiculo.class, fetch = FetchType.LAZY) // cascade =
-																									// CascadeType.ALL
+	@OneToMany(mappedBy = "servico", targetEntity = ServicoVeiculo.class, cascade = CascadeType.PERSIST)
 	private List<ServicoVeiculo> servicoVeiculos;
 
 	public Servico() {
@@ -80,7 +77,7 @@ public class Servico extends BeanIdentificavel {
 	public void setObservação(String observação) {
 		this.observação = observação;
 	}
-	
+
 	@Override
 	public String toString() {
 		return descricao + " R$ " + valor;
@@ -128,5 +125,5 @@ public class Servico extends BeanIdentificavel {
 			return false;
 		return true;
 	}
-	
+
 }

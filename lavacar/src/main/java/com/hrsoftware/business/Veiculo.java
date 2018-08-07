@@ -2,11 +2,10 @@ package com.hrsoftware.business;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Index;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -19,7 +18,6 @@ import com.hrsoftware.comum.BeanIdentificavel;
 public class Veiculo extends BeanIdentificavel {
 
 	@ManyToOne
-	@JoinColumn(name = "cliente_id", nullable = false)
 	private Cliente cliente;
 
 	@Tabela(name = "Nome")
@@ -45,7 +43,7 @@ public class Veiculo extends BeanIdentificavel {
 
 	}
 
-	@OneToMany(mappedBy = "veiculo", targetEntity = ServicoVeiculo.class, fetch = FetchType.LAZY) //, cascade = CascadeType.ALL
+	@OneToMany(mappedBy = "veiculo", targetEntity = ServicoVeiculo.class, cascade = CascadeType.PERSIST)
 	private List<ServicoVeiculo> servicoVeiculos;
 
 	public Cliente getCliente() {
@@ -79,7 +77,7 @@ public class Veiculo extends BeanIdentificavel {
 	public void setCor(String cor) {
 		this.cor = cor;
 	}
-	
+
 	@Override
 	public String toString() {
 		return nome + " - " + placa;
@@ -133,5 +131,5 @@ public class Veiculo extends BeanIdentificavel {
 			return false;
 		return true;
 	}
-	
+
 }

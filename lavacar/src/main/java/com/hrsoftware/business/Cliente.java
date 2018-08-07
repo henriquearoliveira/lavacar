@@ -2,11 +2,10 @@ package com.hrsoftware.business;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Index;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -20,7 +19,6 @@ import com.hrsoftware.comum.BeanIdentificavel;
 public class Cliente extends BeanIdentificavel {
 
 	@ManyToOne
-	@JoinColumn(name = "businessClient_id", nullable = false)
 	private BusinessClient businessClient;
 
 	@Tabela(name = "Nome")
@@ -30,7 +28,7 @@ public class Cliente extends BeanIdentificavel {
 	@Tabela(name = "Telefone")
 	@Column(nullable = true)
 	private String telefone;
-	
+
 	@Column(nullable = false)
 	private String estado;
 
@@ -42,27 +40,27 @@ public class Cliente extends BeanIdentificavel {
 
 	@Column(nullable = true)
 	private String numero;
-	
+
 	@Column(nullable = true)
 	private String bairro;
-	
+
 	@Column(nullable = true)
 	private String sexo;
-	
+
 	@Column(nullable = false)
 	private String cep;
 
-	@OneToMany(mappedBy = "cliente", targetEntity = Veiculo.class, fetch = FetchType.LAZY) //, cascade = CascadeType.ALL
+	@OneToMany(mappedBy = "cliente", targetEntity = Veiculo.class, cascade = CascadeType.PERSIST)
 	private List<Veiculo> vaiculos;
-	
+
 	/**
 	 * PARA O JPA/HIBERNATE
 	 */
 	public Cliente() {
 	}
 
-	public Cliente(String nome, String sexo, String telefone, String cep, String endereco, String numero,
-			String bairro, String cidade, String estado) {
+	public Cliente(String nome, String sexo, String telefone, String cep, String endereco, String numero, String bairro,
+			String cidade, String estado) {
 		this.nome = nome;
 		this.sexo = sexo;
 		this.telefone = telefone;
@@ -97,11 +95,11 @@ public class Cliente extends BeanIdentificavel {
 	public void setTelefone(String telefone) {
 		this.telefone = telefone;
 	}
-	
+
 	public String getEstado() {
 		return estado;
 	}
-	
+
 	public void setEstado(String estado) {
 		this.estado = estado;
 	}
@@ -117,7 +115,7 @@ public class Cliente extends BeanIdentificavel {
 	public String getLogradouro() {
 		return logradouro;
 	}
-	
+
 	public void setLogradouro(String logradouro) {
 		this.logradouro = logradouro;
 	}
@@ -129,31 +127,31 @@ public class Cliente extends BeanIdentificavel {
 	public void setNumero(String numero) {
 		this.numero = numero;
 	}
-	
+
 	public String getBairro() {
 		return bairro;
 	}
-	
+
 	public void setBairro(String bairro) {
 		this.bairro = bairro;
 	}
-	
+
 	public String getSexo() {
 		return sexo;
 	}
-	
+
 	public void setSexo(String sexo) {
 		this.sexo = sexo;
 	}
-	
+
 	public String getCep() {
 		return cep;
 	}
-	
+
 	public void setCep(String cep) {
 		this.cep = cep;
 	}
-	
+
 	@Override
 	public String toString() {
 		return this.getNome();
@@ -243,7 +241,5 @@ public class Cliente extends BeanIdentificavel {
 			return false;
 		return true;
 	}
-	
-	
 
 }

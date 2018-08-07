@@ -3,10 +3,9 @@ package com.hrsoftware.business;
 import java.math.BigDecimal;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -23,7 +22,6 @@ import com.hrsoftware.comum.BeanIdentificavel;
 public class FluxoDeCaixa extends BeanIdentificavel {
 
 	@ManyToOne
-	@JoinColumn(name = "businessClient_id", nullable = false)
 	private BusinessClient businessClient;
 
 	@Column(nullable = true)
@@ -34,10 +32,10 @@ public class FluxoDeCaixa extends BeanIdentificavel {
 	@Column(nullable = true)
 	private boolean fechado;
 
-	@OneToMany(mappedBy = "fluxoDeCaixa", targetEntity = Lancamento.class, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "fluxoDeCaixa", targetEntity = Lancamento.class, cascade = CascadeType.PERSIST)
 	private List<Lancamento> lancamentos;
 
-	@OneToMany(mappedBy = "fluxoDeCaixa", targetEntity = ServicoVeiculo.class, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "fluxoDeCaixa", targetEntity = ServicoVeiculo.class, cascade = CascadeType.PERSIST)
 	private List<ServicoVeiculo> servicoVeiculos;
 
 	public BusinessClient getBusinessClient() {
